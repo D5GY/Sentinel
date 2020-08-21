@@ -3,6 +3,7 @@ import * as nodeUtil from 'util';
 import * as path from 'path';
 import { MessageOptions, MessageAdditions, Message, User, TextBasedChannelFields } from 'discord.js';
 import { CommandResponses } from './Constants';
+import { GuildChannel } from 'discord.js';
 const fileStats = nodeUtil.promisify(_stat);
 export default class Util {
 	static omitObject<T extends { [key: string]: any }, K extends keyof T>(
@@ -83,10 +84,17 @@ export default class Util {
 			|| msg.guild!.roles.cache.find(role => role.name.toLowerCase() === string) || null;
 	}
 	
-	static resolveChannel(msg: Message, string?: string) {
+	static resolveChannel<T extends GuildChannel>(msg: Message, { string, types }: {
+		string?: string;
+		types?: (keyof typeof ChannelType)[];
+	} = {}) {
 		if (typeof string !== 'string') string = msg.content.toLowerCase();
-		return msg.mentions.channels.first()
-			|| msg.guild!.channels.cache.get(string)
-			|| msg.guild!.channels.cache.find(ch => ch.name.toLowerCase() === string);
+		const forcedChannel = msg.mentions.channels.first()
+			|| msg.guild!.channels.cache.get(string);
+		if (forcedChannel) return (!types || types.includes(forcedChannel.type))
+			? forcedChannel as T : null;
+		return msg.guild!.channels.cache.find(
+			ch => (!types || types.includes(ch.type)) && (ch.name.toLowerCase() === string)
+		) as T | undefined || null;
 	}
 }

@@ -189,7 +189,9 @@ export default class SettingsCommand extends Command {
 					(values[data.key] as unknown) = roles;
 				}
 			} else if (isArray(data.type) && data.type[0] === 'channel') {
-				const channel = Util.resolveChannel(response);
+				const channel = Util.resolveChannel<TextChannel>(response, {
+					types: data.type.slice(1) as (keyof typeof ChannelType)[]
+				});
 				if (!channel) {
 					await tryAgain('That is not a valid channel, please try again');
 					continue;
