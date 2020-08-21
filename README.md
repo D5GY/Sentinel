@@ -1,2 +1,2 @@
 # Sentinel
-Sentinel Discord Bot JS Version
+Sentinel Discord Bot TS
