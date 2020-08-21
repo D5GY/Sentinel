@@ -1,8 +1,7 @@
-import { Message, GuildChannel } from 'discord.js';
+import { Message, GuildChannel, TextChannel } from 'discord.js';
 import CommandArguments from '../util/CommandArguments';
 import { getSend, DMPermissionsFunction, GuildPermissionsFunction } from '../util/BaseCommand';
 import CommandError from '../structures/CommandError';
-import { TextChannel } from 'discord.js';
 
 export default async function message(msg: Message) {
 	if (msg.author.bot || !msg.content.length) return;
