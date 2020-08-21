@@ -7,7 +7,8 @@ export default class Command {
 	public client!: SentinelClient;
 	public path: string;
 
-	public aliases: string[];
+  public aliases: string[];
+  public category?: string;
 	public name: string;
 	public usage: string;
 	public dmAllowed: boolean;

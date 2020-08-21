@@ -33,4 +33,4 @@ client.on('ready', () => {
 client.on('error', console.error);
 client.on('warn', console.warn);
 if (config.PRODUCTION) client.on('debug', console.log);
-client.connect(); 
+client.connect();

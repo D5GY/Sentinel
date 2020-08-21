@@ -2,6 +2,7 @@ import { Client, ClientOptions, Collection, Message } from 'discord.js';
 import Util from '../util';
 import DatabaseManager from './database/DatabaseManager';
 import Command from '../util/BaseCommand';
+import * as path from 'path';
 
 type CommandConstructable = (new (client: SentinelClient) => Command);
 
@@ -59,6 +60,11 @@ export default class SentinelClient extends Client {
 			let Struct: CommandConstructable | { default: CommandConstructable } = require(file);
 			if (typeof Struct !== 'function') Struct = Struct.default;
 			const constructed = new Struct(this);
+			const dir = file.split(path.delimiter);
+			const folder = dir[dir.length - 2];
+			if (folder !== 'commands') {
+				constructed.category = folder;
+			}
 			this.commands.set(constructed.name, constructed);
 		}
 		return this.commands;
