@@ -1,0 +1,14 @@
+{
+	"token": "token",
+	"defaultPrefix": "s.",
+	"devs": [
+		"dev-ids"
+	],
+	"database": {
+		"host": "localhost",
+		"user": "root",
+		"password": "",
+		"database": "db-name"
+	},
+	"PRODUCTION": false
+}
