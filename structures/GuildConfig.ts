@@ -69,13 +69,13 @@ export default class GuildConfig {
 	public async edit(data: ConfigEditData, fillNull = false) {
 		const _data: Partial<RawConfig> = {};
 
-		if (typeof data.prefix !== 'undefined') {
+		if (typeof data.prefix !== 'undefined' || fillNull) {
 			_data.prefix = data.prefix === this.client.config.defaultPrefix
-				? null : data.prefix;
-		} else if (fillNull) _data.prefix = null;
+				? null : (data.prefix || null);
+		}
 
-		if (typeof data.modRoles !== 'undefined') {
-			if (data.modRoles === null) _data.mod_roles = null;
+		if (typeof data.modRoles !== 'undefined' || fillNull) {
+			if (!data.modRoles) _data.mod_roles = null;
 			else {
 				const roles = data.modRoles.map(role => this.guild!.roles.resolve(role));
 				if (roles.some(id => id === null)) {
@@ -83,10 +83,10 @@ export default class GuildConfig {
 				}
 				_data.mod_roles = JSON.stringify(roles.map(role => role!.id));
 			}
-		} else if (fillNull) _data.mod_roles = null;
+		}
 
-		if (typeof data.adminRoles !== 'undefined') {
-			if (data.adminRoles === null) _data.admin_roles = null;
+		if (typeof data.adminRoles !== 'undefined' || fillNull) {
+			if (!data.adminRoles) _data.admin_roles = null;
 			else {
 				const roles = data.adminRoles.map(role => this.guild!.roles.resolve(role));
 				if (roles.some(id => id === null)) {
@@ -94,10 +94,10 @@ export default class GuildConfig {
 				}
 				_data.admin_roles = JSON.stringify(roles.map(role => role!.id));
 			}
-		} else if (fillNull) _data.admin_roles = null;
+		}
 
-		if (typeof data.memberJoinsChannel !== 'undefined') {
-			if (data.memberJoinsChannel === null) _data.member_joins_channel = null;
+		if (typeof data.memberJoinsChannel !== 'undefined' || fillNull) {
+			if (!data.memberJoinsChannel) _data.member_joins_channel = null;
 			else {
 				const channel = this.guild!.channels.resolve(data.memberJoinsChannel);
 				if (!channel || channel.type !== 'text') {
@@ -105,10 +105,10 @@ export default class GuildConfig {
 				}
 				_data.member_joins_channel = channel.id;
 			}
-		} else if (fillNull) _data.member_joins_channel = null;
+		}
 
-		if (typeof data.memberLeavesChannel !== 'undefined') {
-			if (data.memberLeavesChannel === null) _data.member_leaves_channel = null;
+		if (typeof data.memberLeavesChannel !== 'undefined' || fillNull) {
+			if (!data.memberLeavesChannel) _data.member_leaves_channel = null;
 			else {
 				const channel = this.guild!.channels.resolve(data.memberLeavesChannel);
 				if (!channel || channel.type !== 'text') {
@@ -116,10 +116,10 @@ export default class GuildConfig {
 				}
 				_data.member_leaves_channel = channel.id;
 			}
-		} else if (fillNull) _data.member_leaves_channel = null;
+		}
 
-		if (typeof data.logsChannel !== 'undefined') {
-			if (data.logsChannel === null) _data.logs_channel = null;
+		if (typeof data.logsChannel !== 'undefined' || fillNull) {
+			if (!data.logsChannel) _data.logs_channel = null;
 			else {
 				const channel = this.guild!.channels.resolve(data.logsChannel);
 				if (!channel || channel.type !== 'text') {
@@ -127,10 +127,11 @@ export default class GuildConfig {
 				}
 				_data.logs_channel = channel.id;
 			}
-		} else if (fillNull) _data.logs_channel = null;
+		}
 
-		if (typeof data.autoMod === 'boolean') _data.auto_mod = Number(data.autoMod) as 0 | 1;
-		else if (fillNull) _data.auto_mod = 0;
+		if (typeof data.autoMod === 'boolean' || fillNull) {
+			_data.auto_mod = Number(data.autoMod) as 0 | 1;
+		}
 
 		await this.client.database.query('UPDATE guilds SET :data WHERE id = :id', {
 			data: _data as SQLValues,
