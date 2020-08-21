@@ -1,3 +1,6 @@
+import GuildConfig from '../structures/GuildConfig';
+import { MessageEmbed } from 'discord.js';
+
 export const SQL_SEARCH_REGEX = /:(\w+)/g;
 
 export enum SQLQueryTypes {
@@ -13,7 +16,30 @@ export const CommandResponses = {
 		args.map(arg => `\`${arg}\``).join(', ')
 	],
 	HELLO_WORLD: () => 'Hello world!',
-	ADDED_CONFIG: () => 'Setup the configuration for your server!'
+	ADDED_CONFIG: () => 'Setup the configuration for your server!',
+	VIEW_CONFIG: (config: GuildConfig) => {
+		const { guild, client } = config;
+		return new MessageEmbed()
+			.setAuthor(`${guild!.name} Config`, guild!.iconURL({ dynamic: true }) ?? undefined)
+			.setDescription([
+				`Prefix: ${config.prefix ?? `Default Prefix (${client.config.defaultPrefix})`}`,
+				`Auto Mod enabled?: ${config.autoMod ? 'Yes' : 'No'}`,
+				`Admin Roles: ${config.adminRoleIDs ? config.adminRoles!.join(', ') : 'None set'}`,
+				`Moderator Roles: ${config.modRoleIDs ? config.modRoles!.join(', ') : 'None set'}`,
+				`Join Messages: ${config.memberJoinsChannelID
+					? config.memberJoinsChannel ?? 'Channel Deleted'
+					:	'Disabled'
+				}`,
+				`Leave Messages: ${config.memberLeavesChannelID
+					? config.memberLeavesChannel ?? 'Channel Deleted'
+					:	'Disabled'
+				}`,
+				`Logs Channel: ${config.logsChannelID
+					? config.logsChannel ?? 'Channel Deleted'
+					:	'Disabled'
+				}`
+			]);
+	}
 };
 
 export const CommandErrors = {

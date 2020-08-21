@@ -2,12 +2,12 @@ import Command, { SendFunction } from '../../util/BaseCommand';
 import SentinelClient from '../../client/SentinelClient';
 import CommandArguments from '../../util/CommandArguments';
 import { Message, TextChannel, MessageMentions } from 'discord.js';
-import CommandError from '../../structures/CommandError';
 import { ConfigEditData } from '../../structures/GuildConfig';
 import Util from '../../util';
 
 export enum SettingModes {
-	SETUP = 'setup'
+	SETUP = 'setup',
+	VIEW = 'view'
 }
 
 type SetupItem = {
@@ -82,11 +82,15 @@ export default class SettingsCommand extends Command {
 	}
 
 	async run(message: Message, args: CommandArguments, send: SendFunction) {
+		if (!args[0] || args[0] === SettingModes.VIEW) {
+			// force-fetch the config to be certian its updated
+			await send('VIEW_CONFIG', await message.guild!.fetchConfig(true));
+			return;
+		}
 		if (args[0] === SettingModes.SETUP) {
 			await this.setup(message, send);
 			return;
 		}
-		throw new CommandError('INVALID_MODE', send, Object.values(SettingModes), args[0]);
 	}
 
 	async setup(message: Message, send: SendFunction) {
