@@ -1,9 +1,8 @@
 import { promises as fs, stat as _stat } from 'fs';
 import * as nodeUtil from 'util';
 import * as path from 'path';
-import { MessageOptions, MessageAdditions } from 'discord.js';
+import { MessageOptions, MessageAdditions, Message, User, TextBasedChannelFields } from 'discord.js';
 import { CommandResponses } from './Constants';
-import { Message } from 'discord.js';
 const fileStats = nodeUtil.promisify(_stat);
 export default class Util {
 	static omitObject<T extends { [key: string]: any }, K extends keyof T>(
@@ -54,5 +53,40 @@ export default class Util {
 		let response: Function | string = CommandResponses[responseName as keyof typeof CommandResponses];
 		if (typeof response === 'function') response = response(...options);
 		return message.channel.send(response);
+	}
+
+	static async awaitResponse(
+		channel: Omit<TextBasedChannelFields, 'bulkDelete'>,
+		user: User,
+		options: { allowedResponses?: string[] | '*' | (
+			(message: Message) => boolean
+		), time?: number }
+	) {
+		if (!options.allowedResponses) options.allowedResponses = '*';
+		const response = (await channel.awaitMessages(message => {
+			if (message.author.id !== user.id) return false;
+			if (options.allowedResponses === '*') return true;
+			else if (Array.isArray(options.allowedResponses)) return options.allowedResponses.includes(message.content.toLowerCase());
+			else if (typeof options.allowedResponses === 'function') return options.allowedResponses(message);
+			return false; 
+		}, {
+			max: 1,
+			time: options.time ?? 18e4
+		})).first();
+		return response ? response : null;
+	}
+
+	static resolveRole(msg: Message, string?: string) {
+		if (typeof string !== 'string') string = msg.content.toLowerCase();
+		return msg.mentions.roles.first()
+			|| msg.guild!.roles.cache.get(string)
+			|| msg.guild!.roles.cache.find(role => role.name.toLowerCase() === string) || null;
+	}
+	
+	static resolveChannel(msg: Message, string?: string) {
+		if (typeof string !== 'string') string = msg.content.toLowerCase();
+		return msg.mentions.channels.first()
+			|| msg.guild!.channels.cache.get(string)
+			|| msg.guild!.channels.cache.find(ch => ch.name.toLowerCase() === string);
 	}
 }
