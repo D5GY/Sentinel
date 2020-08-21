@@ -27,10 +27,8 @@ export default async function message(msg: Message) {
 		if (!command) return;
 		const send = getSend(msg, command);
 		if (command.permissions) {
-			let hasPermission = false;
+			let hasPermission: string | boolean = false;
 			if (typeof command.permissions === 'function') {
-				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-				// @ts-ignore
 				hasPermission = msg.guild
 					? (command.permissions as GuildPermissionsFunction)(msg.member!, msg.channel as TextChannel)
 					: (command.permissions as DMPermissionsFunction)(msg.author, msg.member, msg.channel);

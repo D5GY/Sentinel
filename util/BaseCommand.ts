@@ -41,8 +41,9 @@ export type CommandData = {
 	permissions?: DMPermissionsFunction
 });
 
-export type GuildPermissionsFunction = ((member: GuildMember, channel: TextChannel | NewsChannel) => boolean)
-export type DMPermissionsFunction = (user: User, member: GuildMember | null, channel: DMChannel | TextChannel | NewsChannel) => boolean;
+export type GuildPermissionsFunction = ((member: GuildMember, channel: TextChannel | NewsChannel) => boolean | string)
+export type DMPermissionsFunction = (user: User, member: GuildMember | null, channel: DMChannel | TextChannel | NewsChannel) => boolean | string;
+
 export function getSend(message: Message, command: Command) {
 	function send(
 		content: Exclude<string, keyof typeof CommandResponses> | string[] | MessageOptions | MessageAdditions,
