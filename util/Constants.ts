@@ -16,7 +16,7 @@ export const CommandResponses = {
 };
 
 export const CommandErrors = {
-	NO_PERMISSION: () => 'You don\'t have permissions to use this command!',
+	NO_PERMISSION: (message?: string) => message ?? 'You don\'t have permissions to use this command!',
 	SAY_NO_ARGS: () => 'Please provide something to say!'
 };
 

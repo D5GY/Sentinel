@@ -27,23 +27,23 @@ export default async function message(msg: Message) {
 		if (!command) return;
 		const send = getSend(msg, command);
 		if (command.permissions) {
-			let hasPermission: string | boolean = false;
+			let hasPermission: string | boolean | null = false;
 			if (typeof command.permissions === 'function') {
 				hasPermission = msg.guild
 					? (command.permissions as GuildPermissionsFunction)(msg.member!, msg.channel as TextChannel)
 					: (command.permissions as DMPermissionsFunction)(msg.author, msg.member, msg.channel);
 			} else hasPermission = msg.member!.hasPermission(command.permissions);
-			if (!hasPermission) throw new CommandError('NO_PERMISSION', send);
+			if (hasPermission === false) throw new CommandError('NO_PERMISSION', send);
+			else if (typeof hasPermission === 'string') {
+				return send({ content: hasPermission });
+			} else if (hasPermission === null) return;
 		} 
 		await command.run(msg, args, send);
 	} catch (error) {
 		if (error instanceof CommandError) {
-			if (error.dmError) {
-				return msg.author.send(error.message);
-			}
 			return error.send
 				? error.send(error.message)
-				: msg.channel.send(error.message);
+				: (error.dmError ? msg.author : msg.channel).send(error.message);
 		}
 		client.emit('error', error);
 		msg.channel.send([

@@ -34,15 +34,15 @@ export type CommandData = {
 	name: string;
 	usage?: string;
 } & ({
-	dmAllowed?: false;
+	dmAllowed: false;
 	permissions?: PermissionResolvable | GuildPermissionsFunction;
 } | {
 	dmAllowed: true;
 	permissions?: DMPermissionsFunction
 });
 
-export type GuildPermissionsFunction = ((member: GuildMember, channel: TextChannel | NewsChannel) => boolean | string)
-export type DMPermissionsFunction = (user: User, member: GuildMember | null, channel: DMChannel | TextChannel | NewsChannel) => boolean | string;
+export type GuildPermissionsFunction = ((member: GuildMember, channel: TextChannel | NewsChannel) => (boolean | string | null))
+export type DMPermissionsFunction = (user: User, member: GuildMember | null, channel: DMChannel | TextChannel | NewsChannel) => (boolean | string | null);
 
 export function getSend(message: Message, command: Command) {
 	function send(
