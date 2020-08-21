@@ -1,8 +1,8 @@
-import Command, { SendFunction } from '../util/BaseCommand';
-import SentinelClient from '../client/SentinelClient';
-import CommandArguments from '../util/CommandArguments';
+import Command, { SendFunction } from '../../util/BaseCommand';
+import SentinelClient from '../../client/SentinelClient';
+import CommandArguments from '../../util/CommandArguments';
 import { Message } from 'discord.js';
-import { URLs } from '../util/Constants';
+import { URLs } from '../../util/Constants';
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
@@ -19,7 +19,7 @@ export default class EvalCommand extends Command {
 			permissions: (user) => {
 				return user.client.config.devs.includes(user.id);
 			}
-		}, __dirname);
+		}, __filename);
 	}
 
 	async run(message: Message, args: CommandArguments, send: SendFunction) {

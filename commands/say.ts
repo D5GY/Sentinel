@@ -10,7 +10,7 @@ export default class SayCommand extends Command {
 			aliases: ['repeat'],
 			dmAllowed: true,
 			name: 'say'
-		}, __dirname);
+		}, __filename);
 	}
 
 	async run(message: Message, args: CommandArguments, send: SendFunction) {

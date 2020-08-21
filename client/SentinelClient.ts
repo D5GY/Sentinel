@@ -60,8 +60,10 @@ export default class SentinelClient extends Client {
 			let Struct: CommandConstructable | { default: CommandConstructable } = require(file);
 			if (typeof Struct !== 'function') Struct = Struct.default;
 			const constructed = new Struct(this);
-			const dir = file.split(path.delimiter);
+			const dir = file.split(path.sep);
+			console.log(dir);
 			const folder = dir[dir.length - 2];
+			console.log(folder);
 			if (folder !== 'commands') {
 				constructed.category = folder;
 			}
