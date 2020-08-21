@@ -1,4 +1,6 @@
-import { Client } from 'discord.js';
+import { Client, Role, TextChannel, RoleResolvable } from 'discord.js';
+import { TypeError } from './SentinelError';
+import { SQLValues } from '../client/database/DatabaseManager';
 
 
 // so i don't have to repeat that long part
@@ -55,7 +57,63 @@ export default class GuildConfig {
 	public get memberLeavesChannel() {
 		if (!this.guild || !this.memberLeavesChannelID) return null;
 		return this.guild.channels.cache.get(this.memberLeavesChannelID);
-	}
+  }
+  
+  public async edit(data: ConfigEditData) {
+    const _data: Partial<RawConfig> = {}
+    if (typeof data.prefix !== 'undefined') {
+      _data.prefix = data.prefix === this.client.config.defaultPrefix
+        ? null : data.prefix;
+    }
+    if (typeof data.modRoles !== 'undefined') {
+      if (data.modRoles === null) _data.mod_roles = null;
+      else {
+        const roles = data.modRoles.map(role => this.guild!.roles.resolve(role));
+          if (roles.some(id => id === null)) {
+            throw new TypeError('INVALID_TYPE', 'modRoles', 'Array of RoleResolvables');
+        }
+        _data.mod_roles = JSON.stringify(roles);
+      }
+    }
+    if (typeof data.adminRoles !== 'undefined') {
+      if (data.adminRoles === null) _data.admin_roles = null;
+      else {
+        const roles = data.adminRoles.map(role => this.guild!.roles.resolve(role));
+        if (roles.some(id => id === null)) {
+          throw new TypeError('INVALID_TYPE', 'adminRoles', 'Array of RoleResolvables');
+        }
+        _data.admin_roles = JSON.stringify(roles.map(role => role!.id)); // brb oki
+      }
+    }
+    if (typeof data.memberJoinsChannel !== 'undefined') {
+      if (data.memberJoinsChannel === null) _data.member_joins_channel = null;
+      else {
+        const channel = this.guild!.channels.resolve(data.memberJoinsChannel);
+        if (!channel || channel.type !== 'text') {
+          throw new TypeError('INVALID_TYPE', 'memberJoinsChannel', 'string or TextChannel');
+        }
+        _data.member_joins_channel = channel.id;
+      }
+    }
+    if (typeof data.memberLeavesChannel !== 'undefined') {
+      if (data.memberLeavesChannel === null) _data.member_leaves_channel = null;
+      else {
+        const channel = this.guild!.channels.resolve(data.memberLeavesChannel);
+        if (!channel || channel.type !== 'text') {
+          throw new TypeError('INVALID_TYPE', 'memberLeavesChannel', 'string or TextChannel');
+        }
+        _data.member_leaves_channel = channel.id;
+      }
+    }
+    if (typeof data.autoMod === 'boolean') _data.auto_mod = Number(data.autoMod) as 0 | 1;
+
+    await this.client.database.query("UPDATE guilds SET :data WHERE id = :id", {
+      data: _data as SQLValues,
+      id: this.guildID
+    });
+    this.patch(_data);
+    return this;
+  }
 }
 
 export interface RawConfig {
@@ -67,4 +125,13 @@ export interface RawConfig {
 	logs_channel: string | null;
 	member_leaves_channel: string | null;
 	auto_mod: 0 | 1;
+}
+
+export interface ConfigEditData {
+  prefix?: string | null;
+  modRoles?: RoleResolvable[] | null;
+  adminRoles?: RoleResolvable[] | null;
+  memberJoinsChannel?: string | TextChannel | null;
+  memberLeavesChannel?: string | TextChannel | null;
+  autoMod?: boolean;
 }
