@@ -14,6 +14,7 @@ export default class GuildConfig {
 	public adminRoleIDs!: string[] | null;
 	public memberJoinsChannelID!: string | null;
 	public memberLeavesChannelID!: string | null;
+	public logsChannelID!: string | null;
 	public autoMod!: boolean;
 
 	private _raw!: RawConfig;
@@ -32,6 +33,7 @@ export default class GuildConfig {
 		if (typeof data.admin_roles !== 'undefined') this.adminRoleIDs = parse(data.admin_roles ?? null);
 		if (typeof data.member_joins_channel !== 'undefined') this.memberJoinsChannelID = data.member_joins_channel ?? null;
 		if (typeof data.member_leaves_channel !== 'undefined') this.memberLeavesChannelID = data.member_leaves_channel ?? null;
+		if (typeof data.logs_channel !== 'undefined') this.logsChannelID = data.logs_channel;
 		if (typeof data.auto_mod !== 'undefined') this.autoMod = data.auto_mod ? Boolean(data.auto_mod) : false;
 	}
 
@@ -57,6 +59,11 @@ export default class GuildConfig {
 	public get memberLeavesChannel() {
 		if (!this.guild || !this.memberLeavesChannelID) return null;
 		return this.guild.channels.cache.get(this.memberLeavesChannelID);
+	}
+	
+	public get logsChannel() {
+		if (!this.guild || !this.logsChannelID) return null;
+		return this.guild.channels.cache.get(this.logsChannelID);
 	}
   
 	public async edit(data: ConfigEditData, fillNull = false) {
@@ -111,6 +118,17 @@ export default class GuildConfig {
 			}
 		} else if (fillNull) _data.member_leaves_channel = null;
 
+		if (typeof data.logsChannel !== 'undefined') {
+			if (data.logsChannel === null) _data.logs_channel = null;
+			else {
+				const channel = this.guild!.channels.resolve(data.logsChannel);
+				if (!channel || channel.type !== 'text') {
+					throw new TypeError('INVALID_TYPE', 'logsChannel', 'string or TextChannel');
+				}
+				_data.logs_channel = channel.id;
+			}
+		} else if (fillNull) _data.logs_channel = null;
+
 		if (typeof data.autoMod === 'boolean') _data.auto_mod = Number(data.autoMod) as 0 | 1;
 		else if (fillNull) _data.auto_mod = 0;
 
@@ -129,8 +147,8 @@ export interface RawConfig {
 	mod_roles: string | null; // unparsed json
 	admin_roles: string | null; // unparsed json
 	member_joins_channel: string | null;
-	logs_channel: string | null;
 	member_leaves_channel: string | null;
+	logs_channel: string | null;
 	auto_mod: 0 | 1;
 }
 
@@ -139,6 +157,7 @@ export interface ConfigEditData {
   modRoles?: RoleResolvable[] | null;
   adminRoles?: RoleResolvable[] | null;
   memberJoinsChannel?: string | TextChannel | null;
-  memberLeavesChannel?: string | TextChannel | null;
+	memberLeavesChannel?: string | TextChannel | null;
+	logsChannel?: string | TextChannel | null;
   autoMod?: boolean;
 }

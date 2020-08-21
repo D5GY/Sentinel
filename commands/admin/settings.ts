@@ -53,6 +53,12 @@ const SETUP_ITEMS: SetupItem[] = [{
 	optional: true,
 	type: ['channel', 'text']
 }, {
+	description: 'The channel where logs are sent.',
+	key: 'logsChannel',
+	name: 'Logs Channel',
+	optional: true,
+	type: ['channel', 'text']
+}, {
 	description: 'Auto Moderation (Currently Not Available)',
 	key: 'autoMod',
 	name: 'Auto Moderation',
