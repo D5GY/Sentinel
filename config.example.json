@@ -9,6 +9,10 @@
 		"user": "root",
 		"password": "",
 		"database": "db-name"
-	},
-	"PRODUCTION": false
+  },
+  "channels": { 
+    "suggestions": "",
+    "guildLogs": ""
+  },
+  "PRODUCTION": false
 }

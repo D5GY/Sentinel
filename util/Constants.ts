@@ -1,5 +1,5 @@
 import GuildConfig from '../structures/GuildConfig';
-import { MessageEmbed, GuildMember } from 'discord.js';
+import { MessageEmbed, GuildMember, Guild } from 'discord.js';
 import * as moment from 'moment';
 
 
@@ -87,6 +87,46 @@ export const CommandResponses = {
 				name: 'New Member Count',
 				value: guild.memberCount
 			});
+	},
+	GUILD_CREATE_LOG: (guild: Guild) => {
+		const embed = new MessageEmbed()
+			.setColor(0x00ff00)
+			.setDescription('New guild added')
+			.setFooter('Sentinel')
+			.setTimestamp()
+			.addFields({
+				name: 'Guild Name / ID',
+				value: `${guild.name} / ${guild.id}`
+			}, {
+				name: 'Guild Owner',
+				value: guild.owner ? `${guild.owner.user.tag} (${guild.ownerID})` : guild.ownerID
+			}, {
+				name: 'Member Count',
+				value: `Members: ${guild.memberCount}`
+			});
+		const iconURL = guild.iconURL({ dynamic: true });
+		if (iconURL) embed.setThumbnail(iconURL);
+		return embed;
+	},
+	GUILD_REMOVE_LOG: (guild: Guild) => {
+		const embed = new MessageEmbed()
+			.setColor(0x00ff00)
+			.setDescription('Bot removed from guild')
+			.setFooter('Sentinel')
+			.setTimestamp()
+			.addFields({
+				name: 'Guild Name / ID',
+				value: `${guild.name} / ${guild.id}`
+			}, {
+				name: 'Guild Owner',
+				value: guild.owner ? `${guild.owner.user.tag} (${guild.ownerID})` : guild.ownerID
+			}, {
+				name: 'Member Count',
+				value: `Members: ${guild.memberCount}`
+			});
+		const iconURL = guild.iconURL({ dynamic: true });
+		if (iconURL) embed.setThumbnail(iconURL);
+		return embed;
 	}
 };
 
