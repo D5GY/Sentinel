@@ -110,7 +110,7 @@ export const CommandResponses = {
 	},
 	GUILD_REMOVE_LOG: (guild: Guild) => {
 		const embed = new MessageEmbed()
-			.setColor(0x00ff00)
+			.setColor(0xff0000)
 			.setDescription('Bot removed from guild')
 			.setFooter('Sentinel')
 			.setTimestamp()
