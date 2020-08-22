@@ -38,7 +38,7 @@ export default class GuildConfig {
 	}
 
 	public get guild() {
-		return this.client.guilds.cache.get(this.guildID);
+		return this.client.guilds.cache.get(this.guildID) || null;
 	}
 
 	public get modRoles() {
@@ -53,17 +53,17 @@ export default class GuildConfig {
 
 	public get memberJoinsChannel() {
 		if (!this.guild || !this.memberJoinsChannelID) return null;
-		return this.guild.channels.cache.get(this.memberJoinsChannelID) || null;
+		return (this.guild.channels.cache.get(this.memberJoinsChannelID) || null) as TextChannel | null;
 	}
 
 	public get memberLeavesChannel() {
 		if (!this.guild || !this.memberLeavesChannelID) return null;
-		return this.guild.channels.cache.get(this.memberLeavesChannelID);
+		return (this.guild.channels.cache.get(this.memberLeavesChannelID) || null) as TextChannel | null;
 	}
 	
 	public get logsChannel() {
 		if (!this.guild || !this.logsChannelID) return null;
-		return this.guild.channels.cache.get(this.logsChannelID);
+		return (this.guild.channels.cache.get(this.logsChannelID) || null) as TextChannel | null;
 	}
   
 	public async edit(data: ConfigEditData, fillNull = false) {
