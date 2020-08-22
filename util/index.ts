@@ -39,8 +39,8 @@ export default class Util {
 		return fileNames;
 	}
 
-	static respondTo<T extends keyof typeof CommandResponses>(
-		message: Message,
+	static respondWith<T extends keyof typeof CommandResponses>(
+		channel: TextBasedChannelFields,
 		responseName: T | string | string[] | MessageOptions | MessageAdditions[],
 		...options: (typeof CommandResponses)[T] extends (...args: any[]) => any
 			? Parameters<(typeof CommandResponses)[T]> : [MessageOptions | MessageAdditions]
@@ -49,11 +49,11 @@ export default class Util {
 			typeof responseName !== 'string' ||
 			!CommandResponses[responseName as keyof typeof CommandResponses]
 		) {
-			return message.channel.send(responseName, options[0] as MessageOptions);
+			return channel.send(responseName, options[0] as MessageOptions);
 		}
 		let response: Function | string = CommandResponses[responseName as keyof typeof CommandResponses];
 		if (typeof response === 'function') response = response(...options);
-		return message.channel.send(response);
+		return channel.send(response);
 	}
 
 	static async awaitResponse(
