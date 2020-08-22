@@ -1,6 +1,9 @@
 import GuildConfig from '../structures/GuildConfig';
-import { MessageEmbed } from 'discord.js';
+import { MessageEmbed, GuildMember } from 'discord.js';
+import * as moment from 'moment';
 
+
+export const DEFAULT_TIME_FORMAT = 'DD/MM/YYYY :: HH:mm:ss';
 export const SQL_SEARCH_REGEX = /:(\w+)/g;
 
 export enum SQLQueryTypes {
@@ -39,6 +42,51 @@ export const CommandResponses = {
 					:	'Disabled'
 				}`
 			]);
+	},
+	MEMBER_JOINED: (member: GuildMember) => {
+		const { guild, user } = member;
+		return new MessageEmbed()
+			.setAuthor(guild.name, guild.iconURL({ dynamic: true }) ?? undefined)
+			.setColor(0x00ff00)
+			.setDescription('New Member Joined')
+			.setFooter('Sentinel')
+			.setThumbnail(user.displayAvatarURL({ dynamic: true }))
+			.setTimestamp()
+			.addFields({ 
+				name: 'User / ID',
+				value: `${user.tag} / ${user.id}`
+			},
+			{
+				name: 'Account Created At',
+				value: moment.utc(user.createdAt).format(DEFAULT_TIME_FORMAT) 
+			},
+			{
+				name: 'New Member Count',
+				value: guild.memberCount
+			});
+	},
+	MEMBER_LEFT: (member: GuildMember) => {
+		const { guild, user } = member;
+		return new MessageEmbed()
+			.setAuthor(guild.name, guild.iconURL({ dynamic: true }) ?? undefined)
+			.setColor(0xff0000)
+			.setDescription('Member Left')
+			.setFooter('Sentinel')
+			.setThumbnail(user.displayAvatarURL({ dynamic: true }))
+			.setTimestamp()
+			.addFields({ 
+				name: 'User / ID',
+				value: `${user.tag} / ${user.id}`
+			}, {
+				name: 'Account Created At',
+				value: moment.utc(user.createdAt).format(DEFAULT_TIME_FORMAT) 
+			}, {
+				name: 'Originally Joined At',
+				value: moment.utc(member.joinedAt).format(DEFAULT_TIME_FORMAT)
+			}, {
+				name: 'New Member Count',
+				value: guild.memberCount
+			});
 	}
 };
 
