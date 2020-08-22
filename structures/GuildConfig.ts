@@ -130,7 +130,7 @@ export default class GuildConfig {
 		}
 
 		if (typeof data.autoMod === 'boolean' || fillNull) {
-			_data.auto_mod = Number(data.autoMod) as 0 | 1;
+			_data.auto_mod = Number(data.autoMod ?? 0) as 0 | 1;
 		}
 
 		await this.client.database.query('UPDATE guilds SET :data WHERE id = :id', {
