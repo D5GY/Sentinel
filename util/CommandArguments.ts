@@ -2,7 +2,7 @@ import { Message, Snowflake } from 'discord.js';
 
 const MENTION_REGEX = /<(@!?|@&|#)([0-9]{17,19})>/g;
 const cleanContent = (message: Message) => {
-	return message.content.split(' ').reduce((args, argument) => {
+	return message.content.toLowerCase().split(' ').reduce((args, argument) => {
 		const matches = [...argument.matchAll(MENTION_REGEX)]
 			.map(([, type, id]) => [type, id] as ['@!' | '@&' | '@' | '#', Snowflake]);
 		if (matches.length) {
@@ -32,12 +32,19 @@ const cleanContent = (message: Message) => {
 export default class CommandArguments extends Array<string> {
 	public regular: string[];
 
-	constructor(message: Message) {
-		super(...cleanContent(message).slice(1));
-		this.regular = message.content.split(' ').slice(1);
+	private readonly _message!: Message;
+
+	constructor(message: Message, args: string[], regular: string[]);
+	constructor(message: Message);
+	constructor(message: Message, args?: string[], regular?: string[]) {
+		super(...(args ?? cleanContent(message).slice(1)));
+		this.regular = regular ?? message.content.split(' ').slice(1);
+		Object.defineProperty(this, '_message', { value: message });
 	}
 
 	slice(start?: number, end?: number) {
-		return [...this].slice(start, end);
+		const args = [...this].slice(start, end);
+		const regular = this.regular.slice(start, end);
+		return new CommandArguments(this._message, args, regular);
 	}
 }
