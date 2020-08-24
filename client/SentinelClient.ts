@@ -20,6 +20,12 @@ export default class SentinelClient extends Client {
     readonly guildLogsChannel: TextChannel | null;
     readonly suggestionsChannelID: string;
     readonly suggestionsChannel: TextChannel | null;
+    colours: {
+    blue: string;
+    green: string;
+    red: string;
+    oranage: string;
+  };
 	};
 	public database: DatabaseManager;
 	private __events: { path: string; fn: (...args: any[]) => void }[] = []
