@@ -14,7 +14,7 @@ export default class SayCommand extends Command {
 	}
 
 	async run(message: Message, args: CommandArguments, send: SendFunction) {
-		if (!args.length) throw new CommandError('SAY_NO_ARGS');
+		if (!args.length) throw new CommandError('SAY_NO_ARGS', send);
 		await send({
 			content: args.regular.join(' ')
 		});

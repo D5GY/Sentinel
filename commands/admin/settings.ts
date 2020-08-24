@@ -1,16 +1,18 @@
 import Command, { SendFunction } from '../../util/BaseCommand';
 import SentinelClient from '../../client/SentinelClient';
 import CommandArguments from '../../util/CommandArguments';
-import { Message, TextChannel, MessageMentions } from 'discord.js';
+import { Message, TextChannel, MessageMentions, Role } from 'discord.js';
 import { ConfigEditData } from '../../structures/GuildConfig';
 import Util from '../../util';
+import CommandError from '../../structures/CommandError';
 
 export enum SettingModes {
 	SETUP = 'setup',
-	VIEW = 'view'
+	VIEW = 'view',
+	EDIT = 'edit'
 }
 
-type SetupItem = {
+export type SetupItem = {
 	description: string;
 	key: keyof ConfigEditData;
 	name: string;
@@ -22,7 +24,7 @@ type SetupItem = {
 	]
 }
 
-const SETUP_ITEMS: SetupItem[] = [{
+export const SETUP_ITEMS: SetupItem[] = [{
 	description: 'The prefix for the bot.',
 	key: 'prefix',
 	name: 'Prefix',
@@ -86,11 +88,14 @@ export default class SettingsCommand extends Command {
 			// force-fetch the config to be certian its updated
 			await send('VIEW_CONFIG', await message.guild!.fetchConfig(true));
 			return;
-		}
-		if (args[0] === SettingModes.SETUP) {
+		} else if (args[0] === SettingModes.SETUP) {
 			await this.setup(message, send);
 			return;
+		} else if (args[0] === SettingModes.EDIT) {
+			await this.edit(message, args.slice(1), send);
+			return;
 		}
+		throw new CommandError('INVALID_MODE', Object.values(SettingModes));
 	}
 
 	async setup(message: Message, send: SendFunction) {
@@ -153,55 +158,13 @@ export default class SettingsCommand extends Command {
 				i--;
 			};
 
-			// just so TS is happy, and Array.isArray isn't being called alot
-			const _isArray = Array.isArray(data.type);
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			const isArray = (i: any): i is any[] => _isArray;
-			if (isArray(data.type) && data.type[0] === 'string') {
-				const maxLength = data.type[1] === -1 ? null : data.type[1];
-				const { content } = response;
-				if (maxLength !== null && content.length > maxLength) {
-					await tryAgain('That string is too long, please try again.');
-					continue;
-				}
-				(values[data.key] as unknown) = content;
-			} else if (data.type === 'boolean') {
-				(values[data.key] as unknown) = response.content === 'y';
-			} else if (data.type === 'role' || (isArray(data.type) && data.type[0] === 'roles')) {
-				if (data.type === 'role') {
-					const role = Util.resolveRole(response);
-					if (!role) {
-						await tryAgain('That is not a valid role, please try again');
-						continue;
-					}
-					(values[data.key] as unknown) = role.id;
-				} else {
-					const _roles = response.content.split(/ *, */g);
-					const roles = _roles.map(idOrName => {
-						const [id] = idOrName.match(MessageMentions.ROLES_PATTERN) || [];
-						return Util.resolveRole(response, id || idOrName.toLowerCase());
-					});
-					if (roles.some(role => role === null)) {
-						await tryAgain('1 or more of those roles aren\'t valid, please try again.');
-						continue;
-					}
-					const maxLength = data.type[1];
-					if (maxLength !== -1 && roles.length > maxLength) {
-						await tryAgain(`You can provide a maximum of ${maxLength} roles.`);
-						continue;
-					}
-					(values[data.key] as unknown) = roles;
-				}
-			} else if (isArray(data.type) && data.type[0] === 'channel') {
-				const channel = Util.resolveChannel<TextChannel>(response, {
-					types: data.type.slice(1) as (keyof typeof ChannelType)[]
-				});
-				if (!channel) {
-					await tryAgain('That is not a valid channel, please try again');
-					continue;
-				}
-				(values[data.key] as unknown) = channel.id;
+			const value = this.resolveValue(data, response, response.content);
+			const result = this.validateValue(value, data, 'please try again');
+			if (typeof result === 'string') {
+				await tryAgain(result);
+				continue;
 			}
+			(values[data.key] as unknown) = value;
 		}
 
 		await message.guild!.config!.edit(values, true);
@@ -214,4 +177,91 @@ export default class SettingsCommand extends Command {
 		} else await (message.channel as TextChannel).bulkDelete(messages);
 		return send('ADDED_CONFIG');
 	}
+
+	async edit(message: Message, args: CommandArguments, send: SendFunction) {
+		const item = SETUP_ITEMS.find(item => item.key.toLowerCase() === args[0]);
+		if (!item) {
+			throw new CommandError('INVALID_SETTING', send, SETUP_ITEMS.map(item => item.key));
+		}
+		const newValue = this.resolveValue(
+			item, message, args.regular.slice(1).join(' ')
+		);
+		const result = this.validateValue(newValue, item);
+		if (typeof result === 'string') {
+			throw new CommandError('CUSTOM_MESSAGE', result);
+		}
+		await message.guild!.config!.edit({
+			[item.key]: newValue
+		});
+		await send('UPDATED_CONFIG', item.name);
+	}
+
+	public resolveValue(item: SetupItem, message: Message, string?: string) {
+		if (!string) string = message.content;
+		// just so TS is happy, and Array.isArray isn't being called alot
+		const _isArray = Array.isArray(item.type);
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const isArray = (i: any): i is any[] => _isArray;
+		if (isArray(item.type) && item.type[0] === 'string') {
+			const maxLength = item.type[1] === -1 ? null : item.type[1];
+			if (maxLength !== null && string.length > maxLength) {
+				return null;
+			}
+			return string;
+		} else if (item.type === 'boolean') {
+			return string === 'y';
+		} else if (item.type === 'role' || (isArray(item.type) && item.type[0] === 'roles')) {
+			if (item.type === 'role') {
+				const role = Util.resolveRole(message, string);
+				if (!role) {
+					return null;
+				}
+				return role.id;
+			} else {
+				const _roles = string.split(/ *, */g);
+				const roles = _roles.map(idOrName => {
+					const [id] = idOrName.match(MessageMentions.ROLES_PATTERN) || [];
+					return Util.resolveRole(message, id || idOrName.toLowerCase());
+				});
+				if (roles.some(role => role === null)) {
+					return null;
+				}
+				const maxLength = item.type[1];
+				if (maxLength !== -1 && roles.length > maxLength) {
+					return null;
+				}
+				return roles as Role[];
+			}
+		} else if (isArray(item.type) && item.type[0] === 'channel') {
+			const channel = Util.resolveChannel<TextChannel>(message, {
+				types: item.type.slice(1) as (keyof typeof ChannelType)[],
+				string: string.toLowerCase()
+			});
+			if (!channel) {
+				return null;
+			}
+			return channel.id;
+		}
+		throw null;
+	}
+
+	public validateValue(value: ConfigValue | null, item: SetupItem, suffix = ''): true | string {
+		if (value !== null) return true;
+		if (item.type === 'boolean') {
+			throw null;
+		} else if (item.type === 'role') {
+			return `That is not a valid role${suffix}.`;
+		} else if (item.type[0] === 'string') {
+			return `That string is too long${suffix}.`;
+		} else if (item.type[0] === 'channel') {
+			return `That is not a valid channel${suffix}.`;
+		} else if (item.type[0] === 'roles') {
+			return `You provided an invalid role${
+				item.type[1] !== -1 ? `, or too many roles (max: ${item.type[1]})` : ''
+			}${suffix}.`;
+		}
+		throw null;
+	}
 }
+
+type ConfigValue = Exclude<ReturnType<SettingsCommand['resolveValue']>, null>
