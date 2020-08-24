@@ -12,6 +12,12 @@ export enum SQLQueryTypes {
 	DELETE = 'DELETE'
 }
 
+export enum SentinelColors {
+	GREEN = 0x00FF00,
+	RED = 0xFF0000,
+	LIGHT_BLUE = 0x000D81FF
+}
+
 export const CommandResponses = {
 	UPDATED_CONFIG: (item: string) => `Updated the ${item}.`,
 	NO_IMPLEMENTATION: (args: string[]) => [
@@ -24,7 +30,7 @@ export const CommandResponses = {
 		const { guild, client } = config;
 		return new MessageEmbed()
 			.setAuthor(`${guild!.name} Config`, guild!.iconURL({ dynamic: true }) ?? undefined)
-			.setColor(config.client.config.colours.blue)
+			.setColor(SentinelColors.LIGHT_BLUE)
 			.setDescription([
 				`Prefix: ${config.prefix ?? `Default Prefix (${client.config.defaultPrefix})`}`,
 				`Auto Mod enabled?: ${config.autoMod ? 'Yes' : 'No'}`,
@@ -50,7 +56,7 @@ export const CommandResponses = {
 		const { guild, user } = member;
 		return new MessageEmbed()
 			.setAuthor(guild.name, guild.iconURL({ dynamic: true }) ?? undefined)
-			.setColor(member.client.config.colours.green)
+			.setColor(SentinelColors.GREEN)
 			.setDescription('New Member Joined')
 			.setFooter('Sentinel')
 			.setThumbnail(user.displayAvatarURL({ dynamic: true }))
@@ -72,7 +78,7 @@ export const CommandResponses = {
 		const { guild, user } = member;
 		return new MessageEmbed()
 			.setAuthor(guild.name, guild.iconURL({ dynamic: true }) ?? undefined)
-			.setColor(member.client.config.colours.red)
+			.setColor(SentinelColors.RED)
 			.setDescription('Member Left')
 			.setFooter('Sentinel')
 			.setThumbnail(user.displayAvatarURL({ dynamic: true }))
@@ -93,7 +99,7 @@ export const CommandResponses = {
 	},
 	GUILD_CREATE_LOG: (guild: Guild) => {
 		const embed = new MessageEmbed()
-			.setColor(guild.client.config.colours.green)
+			.setColor(SentinelColors.GREEN)
 			.setDescription('New guild added')
 			.setFooter('Sentinel')
 			.setTimestamp()
@@ -113,7 +119,7 @@ export const CommandResponses = {
 	},
 	GUILD_REMOVE_LOG: (guild: Guild) => {
 		const embed = new MessageEmbed()
-			.setColor(guild.client.config.colours.red)
+			.setColor(SentinelColors.RED)
 			.setDescription('Bot removed from guild')
 			.setFooter('Sentinel')
 			.setTimestamp()
@@ -133,7 +139,7 @@ export const CommandResponses = {
 	},
 	MESSAGE_DELETE_LOG: (message: Message) => {
 		const embed = new MessageEmbed()
-			.setColor(message.client.config.colours.blue)
+			.setColor(SentinelColors.LIGHT_BLUE)
 			.setDescription('Message Deleted')
 			.setFooter('Sentinel')
 			.setTimestamp()
@@ -149,7 +155,7 @@ export const CommandResponses = {
 	},
 	MESSAGE_UPDATE_LOG: (oldMessage: Message, newMessage: Message) => {
 		const embed = new MessageEmbed()
-			.setColor(oldMessage.client.config.colours.blue)
+			.setColor(SentinelColors.LIGHT_BLUE)
 			.setDescription('Message Updated')
 			.setFooter('Sentinel')
 			.setTimestamp()

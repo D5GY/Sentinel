@@ -9,16 +9,10 @@
 		"user": "root",
 		"password": "",
 		"database": "db-name"
-  },
-  "channels": { 
-    "suggestions": "",
-    "guildLogs": ""
-  },
-  "colours": {
-    "blue": "",
-    "green": "",
-    "red": "",
-    "oranage": ""
-  },
-  "PRODUCTION": false
+	},
+	"channels": {
+		"suggestions": "",
+		"guildLogs": ""
+	},
+	"PRODUCTION": false
 }
