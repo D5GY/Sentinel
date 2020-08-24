@@ -14,5 +14,11 @@
     "suggestions": "",
     "guildLogs": ""
   },
+  "colours": {
+    "blue": "",
+    "green": "",
+    "red": "",
+    "oranage": ""
+  },
   "PRODUCTION": false
 }
