@@ -1,4 +1,4 @@
-import { Client, ClientOptions, Collection, Message } from 'discord.js';
+import { Client, ClientOptions, Collection, Message, TextChannel } from 'discord.js';
 import Util from '../util';
 import DatabaseManager from './database/DatabaseManager';
 import Command from '../util/BaseCommand';
@@ -15,7 +15,17 @@ export default class SentinelClient extends Client {
 	public config: {
 		defaultPrefix: string;
 		devs: string[];
-		PRODUCTION: boolean;
+    PRODUCTION: boolean;
+    readonly guildLogsChannelID: string;
+    readonly guildLogsChannel: TextChannel | null;
+    readonly suggestionsChannelID: string;
+    readonly suggestionsChannel: TextChannel | null;
+    colours: {
+      blue: string;
+      green: string;
+      red: string;
+      oranage: string;
+    };
 	};
 	public database: DatabaseManager;
 	private __events: { path: string; fn: (...args: any[]) => void }[] = []
@@ -23,8 +33,14 @@ export default class SentinelClient extends Client {
 	constructor(config: SentinelConfig, options?: ClientOptions) {
 		super(options);
 		this.token = config.token;
-		delete config.token;
-		this.config = Util.omitObject(config, ['database', 'token']);
+		const _config = Util.omitObject(config, ['database', 'token', 'channels']);
+		Object.defineProperties(_config, {
+			guildLogsChannelID: { value: config.channels.guildLogs },
+			guildLogsChannel: { get: () => this.channels.resolve(this.config.guildLogsChannelID) },
+			suggestionsChannelID: { value: config.channels.suggestions },
+			suggestionsChannel: { get: () => this.channels.resolve(this.config.suggestionsChannelID) }
+		});
+		this.config = _config as SentinelClient['config'];
 		this.database = new DatabaseManager(config.database);
 	}
 
@@ -112,7 +128,11 @@ export interface SentinelConfig {
 		user: string;
 		password: string;
 		database: string;
-	};
+  };
+  channels: {
+    suggestions: string;
+    guildLogs: string;
+  };
 	PRODUCTION: boolean;
 }
 

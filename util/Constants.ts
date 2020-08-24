@@ -1,6 +1,8 @@
 import GuildConfig from '../structures/GuildConfig';
-import { MessageEmbed, StringResolvable, Util as DJSUtil } from 'discord.js';
+import { MessageEmbed, GuildMember, Guild, Message, StringResolvable, Util as DJSUtil } from 'discord.js';
+import * as moment from 'moment';
 
+export const DEFAULT_TIME_FORMAT = 'DD/MM/YYYY :: HH:mm:ss';
 export const SQL_SEARCH_REGEX = /:(\w+)/g;
 
 export enum SQLQueryTypes {
@@ -22,6 +24,7 @@ export const CommandResponses = {
 		const { guild, client } = config;
 		return new MessageEmbed()
 			.setAuthor(`${guild!.name} Config`, guild!.iconURL({ dynamic: true }) ?? undefined)
+			.setColor(config.client.config.colours.blue)
 			.setDescription([
 				`Prefix: ${config.prefix ?? `Default Prefix (${client.config.defaultPrefix})`}`,
 				`Auto Mod enabled?: ${config.autoMod ? 'Yes' : 'No'}`,
@@ -42,6 +45,122 @@ export const CommandResponses = {
 				'',
 				`You can use \`${config.prefix ?? client.config.defaultPrefix}settings edit [key] [newValue]\` to change any of these.`
 			]).setFooter('Sentinel');
+	},
+	MEMBER_JOINED: (member: GuildMember) => {
+		const { guild, user } = member;
+		return new MessageEmbed()
+			.setAuthor(guild.name, guild.iconURL({ dynamic: true }) ?? undefined)
+			.setColor(member.client.config.colours.green)
+			.setDescription('New Member Joined')
+			.setFooter('Sentinel')
+			.setThumbnail(user.displayAvatarURL({ dynamic: true }))
+			.setTimestamp()
+			.addFields({ 
+				name: 'User / ID',
+				value: `${user.tag} / ${user.id}`
+			},
+			{
+				name: 'Account Created At',
+				value: moment.utc(user.createdAt).format(DEFAULT_TIME_FORMAT) 
+			},
+			{
+				name: 'New Member Count',
+				value: guild.memberCount
+			});
+	},
+	MEMBER_LEFT: (member: GuildMember) => {
+		const { guild, user } = member;
+		return new MessageEmbed()
+			.setAuthor(guild.name, guild.iconURL({ dynamic: true }) ?? undefined)
+			.setColor(member.client.config.colours.red)
+			.setDescription('Member Left')
+			.setFooter('Sentinel')
+			.setThumbnail(user.displayAvatarURL({ dynamic: true }))
+			.setTimestamp()
+			.addFields({ 
+				name: 'User / ID',
+				value: `${user.tag} / ${user.id}`
+			}, {
+				name: 'Account Created At',
+				value: moment.utc(user.createdAt).format(DEFAULT_TIME_FORMAT) 
+			}, {
+				name: 'Originally Joined At',
+				value: moment.utc(member.joinedAt).format(DEFAULT_TIME_FORMAT)
+			}, {
+				name: 'New Member Count',
+				value: guild.memberCount
+			});
+	},
+	GUILD_CREATE_LOG: (guild: Guild) => {
+		const embed = new MessageEmbed()
+			.setColor(guild.client.config.colours.green)
+			.setDescription('New guild added')
+			.setFooter('Sentinel')
+			.setTimestamp()
+			.addFields({
+				name: 'Guild Name / ID',
+				value: `${guild.name} / ${guild.id}`
+			}, {
+				name: 'Guild Owner',
+				value: guild.owner ? `${guild.owner.user.tag} (${guild.ownerID})` : guild.ownerID
+			}, {
+				name: 'Member Count',
+				value: `Members: ${guild.memberCount}`
+			});
+		const iconURL = guild.iconURL({ dynamic: true });
+		if (iconURL) embed.setThumbnail(iconURL);
+		return embed;
+	},
+	GUILD_REMOVE_LOG: (guild: Guild) => {
+		const embed = new MessageEmbed()
+			.setColor(guild.client.config.colours.red)
+			.setDescription('Bot removed from guild')
+			.setFooter('Sentinel')
+			.setTimestamp()
+			.addFields({
+				name: 'Guild Name / ID',
+				value: `${guild.name} / ${guild.id}`
+			}, {
+				name: 'Guild Owner',
+				value: guild.owner ? `${guild.owner.user.tag} (${guild.ownerID})` : guild.ownerID
+			}, {
+				name: 'Member Count',
+				value: `Members: ${guild.memberCount}`
+			});
+		const iconURL = guild.iconURL({ dynamic: true });
+		if (iconURL) embed.setThumbnail(iconURL);
+		return embed;
+	},
+	MESSAGE_DELETE_LOG: (message: Message) => {
+		const embed = new MessageEmbed()
+			.setColor(message.client.config.colours.blue)
+			.setDescription('Message Deleted')
+			.setFooter('Sentinel')
+			.setTimestamp()
+			.addFields({
+				name: 'Message Content',
+				value: message.content || 'Unable to retrive content'
+			}, 
+			{
+				name: 'Deleted In',
+				value: message.channel
+			});
+		return embed;
+	},
+	MESSAGE_UPDATE_LOG: (oldMessage: Message, newMessage: Message) => {
+		const embed = new MessageEmbed()
+			.setColor(oldMessage.client.config.colours.blue)
+			.setDescription('Message Updated')
+			.setFooter('Sentinel')
+			.setTimestamp()
+			.addFields({
+				name: 'Old Message',
+				value: oldMessage.content
+			}, {
+				name: 'New Message',
+				value: newMessage.content
+			});
+		return embed;
 	}
 };
 

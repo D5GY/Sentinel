@@ -1,7 +1,7 @@
 import { promises as fs, stat as _stat } from 'fs';
 import * as nodeUtil from 'util';
 import * as path from 'path';
-import { MessageOptions, MessageAdditions, Message, User, TextBasedChannelFields } from 'discord.js';
+import { Message, User, TextBasedChannelFields } from 'discord.js';
 import { CommandResponses } from './Constants';
 import { GuildChannel } from 'discord.js';
 const fileStats = nodeUtil.promisify(_stat);
@@ -39,21 +39,15 @@ export default class Util {
 		return fileNames;
 	}
 
-	static respondTo<T extends keyof typeof CommandResponses>(
-		message: Message,
-		responseName: T | string | string[] | MessageOptions | MessageAdditions[],
-		...options: (typeof CommandResponses)[T] extends (...args: any[]) => any
-			? Parameters<(typeof CommandResponses)[T]> : [MessageOptions | MessageAdditions]
+	static respondWith<T extends keyof typeof CommandResponses>(
+		channel: TextBasedChannelFields,
+		responseName: T,
+		...options: Parameters<(typeof CommandResponses)[T]>
 	) {
-		if (
-			typeof responseName !== 'string' ||
-			!CommandResponses[responseName as keyof typeof CommandResponses]
-		) {
-			return message.channel.send(responseName, options[0] as MessageOptions);
-		}
-		let response: Function | string = CommandResponses[responseName as keyof typeof CommandResponses];
-		if (typeof response === 'function') response = response(...options);
-		return message.channel.send(response);
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		const response = CommandResponses[responseName as keyof typeof CommandResponses](...options);
+		return channel.send(response);
 	}
 
 	static async awaitResponse(
