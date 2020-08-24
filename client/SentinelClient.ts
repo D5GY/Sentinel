@@ -21,11 +21,11 @@ export default class SentinelClient extends Client {
     readonly suggestionsChannelID: string;
     readonly suggestionsChannel: TextChannel | null;
     colours: {
-    blue: string;
-    green: string;
-    red: string;
-    oranage: string;
-  };
+      blue: string;
+      green: string;
+      red: string;
+      oranage: string;
+    };
 	};
 	public database: DatabaseManager;
 	private __events: { path: string; fn: (...args: any[]) => void }[] = []
