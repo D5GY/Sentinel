@@ -1,13 +1,13 @@
-import { Message } from 'discord.js';
+import { Message, PartialMessage } from 'discord.js';
 import Util from '../util';
 export default async function messageDelete(
-	message: Message
+	message: Message | PartialMessage
 ) {
 	try {
-		if(message.author.bot) return;
-		const guildConfig = await message.guild?.fetchConfig();
+		if (message.author?.bot || !message.guild) return;
+		const guildConfig = await message.guild.fetchConfig();
 
-		if (guildConfig?.logsChannel) {
+		if (guildConfig.logsChannel) {
 			await Util.respondWith(guildConfig.logsChannel, 'MESSAGE_DELETE_LOG', message);
 		}
 

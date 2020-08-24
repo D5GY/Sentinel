@@ -1,9 +1,8 @@
 import { promises as fs, stat as _stat } from 'fs';
 import * as nodeUtil from 'util';
 import * as path from 'path';
-import { Message, User, TextBasedChannelFields } from 'discord.js';
+import { Message, User, TextBasedChannelFields, GuildChannel } from 'discord.js';
 import { CommandResponses } from './Constants';
-import { GuildChannel } from 'discord.js';
 const fileStats = nodeUtil.promisify(_stat);
 export default class Util {
 	static omitObject<T extends { [key: string]: any }, K extends keyof T>(

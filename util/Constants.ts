@@ -1,6 +1,7 @@
 import GuildConfig from '../structures/GuildConfig';
 import { MessageEmbed, GuildMember, Guild, Message, StringResolvable, Util as DJSUtil } from 'discord.js';
 import * as moment from 'moment';
+import { PartialMessage } from 'discord.js';
 
 export const DEFAULT_TIME_FORMAT = 'DD/MM/YYYY :: HH:mm:ss';
 export const SQL_SEARCH_REGEX = /:(\w+)/g;
@@ -137,36 +138,45 @@ export const CommandResponses = {
 		if (iconURL) embed.setThumbnail(iconURL);
 		return embed;
 	},
-	MESSAGE_DELETE_LOG: (message: Message) => {
-		const embed = new MessageEmbed()
+	MESSAGE_DELETE_LOG: (message: Message | PartialMessage) => {
+		return new MessageEmbed()
 			.setColor(SentinelColors.LIGHT_BLUE)
 			.setDescription('Message Deleted')
 			.setFooter('Sentinel')
 			.setTimestamp()
 			.addFields({
 				name: 'Message Content',
-				value: message.content || 'Unable to retrive content'
-			}, 
-			{
+				value: message.content === null
+					? 'Content uncached' : (message.content || 'No Content')
+			}, {
 				name: 'Deleted In',
-				value: message.channel
+				value: message.channel.toString(),
+				inline: true
+			}, {
+				name: 'Author',
+				value: message.author
+					? `${message.author.tag} (${message.author.id})`
+					: 'Unknown User',
+				inline: true
 			});
-		return embed;
 	},
-	MESSAGE_UPDATE_LOG: (oldMessage: Message, newMessage: Message) => {
-		const embed = new MessageEmbed()
+	MESSAGE_UPDATE_LOG: (oldMessage: Message | PartialMessage, newMessage: Message) => {
+		return new MessageEmbed()
 			.setColor(SentinelColors.LIGHT_BLUE)
 			.setDescription('Message Updated')
 			.setFooter('Sentinel')
 			.setTimestamp()
 			.addFields({
 				name: 'Old Message',
-				value: oldMessage.content
+				value: oldMessage.content === null
+					? 'Content uncached' : (oldMessage.content || 'No Content')
 			}, {
 				name: 'New Message',
-				value: newMessage.content
+				value: newMessage.content || 'No Content'
+			}, {
+				name: 'Author',
+				value: `${newMessage.author.tag} (${newMessage.author.id})`
 			});
-		return embed;
 	}
 };
 
