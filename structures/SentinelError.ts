@@ -1,5 +1,6 @@
 const Errors = {
-	INVALID_TYPE: (param: string, expected: string) => `Supplied ${param} is not ${expected}`
+	INVALID_TYPE: (param: string, expected: string) => `Supplied ${param} is not ${expected}`,
+	PROPERTY_DOESNT_EXIST: (path: string[], current: string) => `Property ${current} doesn't exist on ${path.join('.')}`
 };
 
 const makeError = (Class: typeof Error) => {

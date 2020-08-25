@@ -3,6 +3,7 @@ import * as nodeUtil from 'util';
 import * as path from 'path';
 import { Message, User, TextBasedChannelFields, GuildChannel } from 'discord.js';
 import { CommandResponses } from './Constants';
+import { Error } from '../structures/SentinelError';
 const fileStats = nodeUtil.promisify(_stat);
 export default class Util {
 	static omitObject<T extends { [key: string]: any }, K extends keyof T>(
@@ -89,5 +90,30 @@ export default class Util {
 		return msg.guild!.channels.cache.find(
 			ch => (!types || types.includes(ch.type)) && (ch.name.toLowerCase() === string)
 		) as T | undefined || null;
+	}
+
+	static getProp(
+		object: any, path: string[], omit = ['token']
+	) {
+		if (typeof object[path[0]] !== 'object' && path.length > 1) {
+			throw new Error('PROPERTY_DOESNT_EXIST', ['Given Object'], path[0]);
+		}
+		let current: any = object[path[0]];
+		for (let i = 1;i < path.length;i++) {
+			const prop = path[i];
+			if (omit.includes(prop)) break;
+			const isLast = i === (path.length-1);
+			const type = typeof current[prop];
+			if (
+				(type !== 'object' && !isLast) || (type === 'undefined' && isLast)
+			) {	
+				throw new Error(
+					'PROPERTY_DOESNT_EXIST',
+					path.slice(0, i), prop
+				);
+			}
+			current = current[prop];
+		}
+		return current;
 	}
 }
