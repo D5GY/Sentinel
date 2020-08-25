@@ -16,7 +16,7 @@ export enum SQLQueryTypes {
 export enum SentinelColors {
 	GREEN = 0x00FF00,
 	RED = 0xFF0000,
-	LIGHT_BLUE = 0x000D81FF
+	LIGHT_BLUE = 0x2A84B6
 }
 
 export const CommandResponses = {
