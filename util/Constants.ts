@@ -1,10 +1,16 @@
 import GuildConfig from '../structures/GuildConfig';
-import { MessageEmbed, GuildMember, Guild, Message, StringResolvable, Util as DJSUtil } from 'discord.js';
+import { MessageEmbed, GuildMember, Guild, Message, StringResolvable, Util as DJSUtil, PartialMessage, Permissions } from 'discord.js';
 import * as moment from 'moment';
-import { PartialMessage } from 'discord.js';
 
-export const DEFAULT_TIME_FORMAT = 'DD/MM/YYYY :: HH:mm:ss';
+export const DEFAULT_TIME_FORMAT = 'DD/MM/YYYY HH:mm:ss';
 export const SQL_SEARCH_REGEX = /:(\w+)/g;
+
+const upperFirst = (string: string, lowerRest = true) => (
+	string.charAt(0).toUpperCase() + (lowerRest ? string.toLowerCase() : string).slice(1)
+);
+const cleanPermissions = (perms: Permissions) => perms.toArray().map(
+	perm => `\`${upperFirst(perm.toLowerCase().replace(/_(.)/g, (str, match) => ` ${match.toUpperCase()}`), false)}\``
+).join(', ');
 
 export enum SQLQueryTypes {
 	INSERT = 'INSERT',
@@ -16,10 +22,18 @@ export enum SQLQueryTypes {
 export enum SentinelColors {
 	GREEN = 0x00FF00,
 	RED = 0xFF0000,
-	LIGHT_BLUE = 0x2A84B6
+	LIGHT_BLUE = 0x0066ff
 }
 
+const EMBED_TIP = '*TIP: if you give me the `Embed Links` Permission I can display this in an embed!*';
+
 export const CommandResponses = {
+	CLIENT_MISSING_PERMISSIONS: (clientPermissions: Permissions, guildPermissions: Permissions) => {
+		const resp = [];
+		if (clientPermissions.bitfield !== 0) resp.push(`${cleanPermissions(clientPermissions)} for this channel`);
+		if (guildPermissions.bitfield !== 0) resp.push(`${cleanPermissions(guildPermissions)} for the guild`);
+		return `I require ${resp.join(' and ')}.`;
+	},
 	UPDATED_CONFIG: (item: string) => `Updated the ${item}.`,
 	NO_IMPLEMENTATION: (args: string[]) => [
 		'This command has no implementation method, args:',
@@ -27,31 +41,37 @@ export const CommandResponses = {
 	],
 	HELLO_WORLD: () => 'Hello world!',
 	ADDED_CONFIG: () => 'Setup the configuration for your server!',
-	VIEW_CONFIG: (config: GuildConfig) => {
+	VIEW_CONFIG: (config: GuildConfig, hasEmbed: boolean) => {
 		const { guild, client } = config;
+		const description = [
+			`Prefix: ${config.prefix ?? `Default Prefix (${client.config.defaultPrefix})`}`,
+			`Auto Mod enabled?: ${config.autoMod ? 'Yes' : 'No'}`,
+			`Admin Roles: ${config.adminRoleIDs ? config.adminRoles!.join(', ') : 'None set'}`,
+			`Moderator Roles: ${config.modRoleIDs ? config.modRoles!.join(', ') : 'None set'}`,
+			`Join Messages: ${config.memberJoinsChannelID
+				? config.memberJoinsChannel ?? 'Channel Deleted'
+				:	'Disabled'
+			}`,
+			`Leave Messages: ${config.memberLeavesChannelID
+				? config.memberLeavesChannel ?? 'Channel Deleted'
+				:	'Disabled'
+			}`,
+			`Logs Channel: ${config.logsChannelID
+				? config.logsChannel ?? 'Channel Deleted'
+				:	'Disabled'
+			}`,
+			'',
+			`You can use \`${config.prefix ?? client.config.defaultPrefix}settings edit [key] [newValue]\` to change any of these.`
+		];
+		if (!hasEmbed) {
+			description.unshift(EMBED_TIP);
+			return description;
+		}
 		return new MessageEmbed()
 			.setAuthor(`${guild!.name} Config`, guild!.iconURL({ dynamic: true }) ?? undefined)
 			.setColor(SentinelColors.LIGHT_BLUE)
-			.setDescription([
-				`Prefix: ${config.prefix ?? `Default Prefix (${client.config.defaultPrefix})`}`,
-				`Auto Mod enabled?: ${config.autoMod ? 'Yes' : 'No'}`,
-				`Admin Roles: ${config.adminRoleIDs ? config.adminRoles!.join(', ') : 'None set'}`,
-				`Moderator Roles: ${config.modRoleIDs ? config.modRoles!.join(', ') : 'None set'}`,
-				`Join Messages: ${config.memberJoinsChannelID
-					? config.memberJoinsChannel ?? 'Channel Deleted'
-					:	'Disabled'
-				}`,
-				`Leave Messages: ${config.memberLeavesChannelID
-					? config.memberLeavesChannel ?? 'Channel Deleted'
-					:	'Disabled'
-				}`,
-				`Logs Channel: ${config.logsChannelID
-					? config.logsChannel ?? 'Channel Deleted'
-					:	'Disabled'
-				}`,
-				'',
-				`You can use \`${config.prefix ?? client.config.defaultPrefix}settings edit [key] [newValue]\` to change any of these.`
-			]).setFooter('Sentinel');
+			.setDescription(description)
+			.setFooter('Sentinel');
 	},
 	MEMBER_JOINED: (member: GuildMember) => {
 		const { guild, user } = member;

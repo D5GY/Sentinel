@@ -1,4 +1,4 @@
-import { MessageOptions, MessageAdditions, PermissionResolvable, GuildMember, TextChannel, NewsChannel, DMChannel, User, Message } from 'discord.js';
+import { MessageOptions, MessageAdditions, PermissionResolvable, GuildMember, TextChannel, NewsChannel, DMChannel, User, Message, Permissions } from 'discord.js';
 import CommandArguments from './CommandArguments';
 import { CommandResponses } from './Constants';
 import SentinelClient from '../client/SentinelClient';
@@ -8,11 +8,12 @@ export default class Command {
 	public path: string;
 
   public aliases: string[];
+  public clientPermissions: Permissions | null;
   public category?: string;
 	public name: string;
 	public usage: string;
 	public dmAllowed: boolean;
-	public permissions?: CommandData['permissions'];
+	public permissions?: number | DMPermissionsFunction | GuildPermissionsFunction;
 
 	constructor(client: SentinelClient, data: CommandData, path: string) {
 		Object.defineProperty(this, 'client', { value: client });
@@ -21,7 +22,18 @@ export default class Command {
 		this.name = data.name;
 		this.usage = data.usage ?? '';
 		this.dmAllowed = data.dmAllowed ?? false;
-		this.permissions = data.permissions;
+		if (data.permissions) {
+			this.permissions = typeof data.permissions === 'function'
+				? data.permissions : Permissions.resolve(data.permissions);
+		}
+		if (data.clientPermissions instanceof Permissions) {
+			this.clientPermissions = data.clientPermissions.bitfield === 0 ? null : data.clientPermissions;
+		} else {
+			const permissions = new Permissions(data.clientPermissions);
+			if (!permissions.has(Permissions.FLAGS.SEND_MESSAGES)) permissions.add(Permissions.FLAGS.SEND_MESSAGES);
+			this.clientPermissions = permissions;
+		}
+		if (this.clientPermissions !== null) this.clientPermissions.freeze();
 	}
 
 	async run(message: Message, args: CommandArguments, send: SendFunction) {
@@ -30,7 +42,8 @@ export default class Command {
 }
 
 export type CommandData = {
-	aliases?: string[];
+  aliases?: string[];
+  clientPermissions?: PermissionResolvable;
 	name: string;
 	usage?: string;
 } & ({

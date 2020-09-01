@@ -1,7 +1,7 @@
 import Command, { SendFunction } from '../../util/BaseCommand';
 import SentinelClient from '../../client/SentinelClient';
 import CommandArguments from '../../util/CommandArguments';
-import { Message, TextChannel, MessageMentions, Role } from 'discord.js';
+import { Message, TextChannel, MessageMentions, Role, Permissions } from 'discord.js';
 import { ConfigEditData } from '../../structures/GuildConfig';
 import Util from '../../util';
 import CommandError from '../../structures/CommandError';
@@ -74,7 +74,7 @@ export default class SettingsCommand extends Command {
 			name: 'settings',
 			dmAllowed: false,
 			permissions: (member) => {
-				if (member.hasPermission(8)) return true;
+				if (member.hasPermission(Permissions.FLAGS.ADMINISTRATOR)) return true;
 				const { guild: { config } } = member;
 				if (!config) return null;
 				if (config.adminRoleIDs?.some(id => member.roles.cache.has(id))) return true;
@@ -86,7 +86,10 @@ export default class SettingsCommand extends Command {
 	async run(message: Message, args: CommandArguments, send: SendFunction) {
 		if (!args[0] || args[0] === SettingModes.VIEW) {
 			// force-fetch the config to be certian its updated
-			await send('VIEW_CONFIG', await message.guild!.fetchConfig(true));
+			await send('VIEW_CONFIG',
+				await message.guild!.fetchConfig(true),
+        (message.channel as TextChannel).permissionsFor(this.client.user!)!.has(Permissions.FLAGS.EMBED_LINKS)
+			);
 			return;
 		} else if (args[0] === SettingModes.SETUP) {
 			await this.setup(message, send);
