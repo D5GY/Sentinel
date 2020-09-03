@@ -1,9 +1,10 @@
 import GuildConfig from '../structures/GuildConfig';
-import { MessageEmbed, GuildMember, Guild, Message, StringResolvable, Util as DJSUtil, PartialMessage, Permissions } from 'discord.js';
+import { MessageEmbed, GuildMember, Guild, Message, StringResolvable, Util as DJSUtil, PartialMessage, Permissions, User } from 'discord.js';
 import * as moment from 'moment';
 
 export const DEFAULT_TIME_FORMAT = 'DD/MM/YYYY HH:mm:ss';
 export const SQL_SEARCH_REGEX = /:(\w+)/g;
+export const SNOWFLAKE_REGEX = /(\d{16,19})/g;
 
 const upperFirst = (string: string, lowerRest = true) => (
 	string.charAt(0).toUpperCase() + (lowerRest ? string.toLowerCase() : string).slice(1)
@@ -11,6 +12,9 @@ const upperFirst = (string: string, lowerRest = true) => (
 const cleanPermissions = (perms: Permissions) => perms.toArray().map(
 	perm => `\`${upperFirst(perm.toLowerCase().replace(/_(.)/g, (str, match) => ` ${match.toUpperCase()}`), false)}\``
 ).join(', ');
+const plural = (word: string, bool: boolean) => `${word}${bool ? 's' : ''}`;
+const formatUser = (user: User) => `${user} ${user.tag} (${user.id})`;
+const insertFullStop = (str: string) => str.endsWith('.') ? str : `${str}.`;
 
 export enum SQLQueryTypes {
 	INSERT = 'INSERT',
@@ -22,10 +26,16 @@ export enum SQLQueryTypes {
 export enum SentinelColors {
 	GREEN = 0x00FF00,
 	RED = 0xFF0000,
-	LIGHT_BLUE = 0x0066ff
+  LIGHT_BLUE = 0x0066ff,
+  ORANGE = 0Xff873d
 }
 
-const EMBED_TIP = '*TIP: if you give me the `Embed Links` Permission I can display this in an embed!*';
+export enum ModerationTypes {
+  BAN, KICK, MUTE, WARN, SOFTBAN
+}
+
+export const EMBED_TIP = '*TIP: if you give me the `Embed Links` Permission I can display this in an embed!*';
+export const DEFAULT_REASON = 'No reason provided.';
 
 export const CommandResponses = {
 	CLIENT_MISSING_PERMISSIONS: (clientPermissions: Permissions, guildPermissions: Permissions) => {
@@ -129,7 +139,7 @@ export const CommandResponses = {
 				value: `${guild.name} / ${guild.id}`
 			}, {
 				name: 'Guild Owner',
-				value: guild.owner ? `${guild.owner.user.tag} (${guild.ownerID})` : guild.ownerID
+				value: guild.owner ? formatUser(guild.owner.user) : guild.ownerID
 			}, {
 				name: 'Member Count',
 				value: `Members: ${guild.memberCount}`
@@ -149,7 +159,7 @@ export const CommandResponses = {
 				value: `${guild.name} / ${guild.id}`
 			}, {
 				name: 'Guild Owner',
-				value: guild.owner ? `${guild.owner.user.tag} (${guild.ownerID})` : guild.ownerID
+				value: guild.owner ? formatUser(guild.owner.user) : guild.ownerID
 			}, {
 				name: 'Member Count',
 				value: `Members: ${guild.memberCount}`
@@ -175,7 +185,7 @@ export const CommandResponses = {
 			}, {
 				name: 'Author',
 				value: message.author
-					? `${message.author.tag} (${message.author.id})`
+					? formatUser(message.author)
 					: 'Unknown User',
 				inline: true
 			});
@@ -195,8 +205,32 @@ export const CommandResponses = {
 				value: newMessage.content || 'No Content'
 			}, {
 				name: 'Author',
-				value: `${newMessage.author.tag} (${newMessage.author.id})`
+				value: formatUser(newMessage.author)
 			});
+	},
+	REMOVED_USER_LOG: (action: ModerationTypes.BAN | ModerationTypes.KICK, moderator: GuildMember, users: User[], reason: string) => {
+		const isBan = action === ModerationTypes.BAN;
+		const text = plural('User', users.length > 1);
+		return new MessageEmbed()
+			.setColor(isBan ? SentinelColors.RED : SentinelColors.ORANGE)
+			.setAuthor(`${text} ${isBan ? 'banned' : 'kicked'}`, moderator.guild.iconURL({ dynamic: true }) ?? undefined)
+			.setFooter('Sentinel')
+			.setTimestamp()
+			.addFields({
+				name: `${isBan ? 'Banned' : 'Kicked'} ${text}:`,
+				value: users.map(user => formatUser(user))
+			}, {
+				name: 'Moderator Responsible',
+				value: formatUser(moderator.user)
+			}, {
+				name: 'Reason',
+				value: reason ? insertFullStop(reason) : DEFAULT_REASON
+			});
+	},
+	REMOVED_USER: (action: ModerationTypes.BAN | ModerationTypes.KICK, users: User[], reason: string) => {
+		return `${action === ModerationTypes.BAN ? 'Banned' : 'Kicked'} ${
+			users.length === 1 ? users[0].tag : `${users.length} Users`
+		} for ${reason ? insertFullStop(reason) : DEFAULT_REASON}`;
 	}
 };
 
@@ -211,7 +245,12 @@ export const CommandErrors = {
 	}, try one of ${modes.slice(0, -1).map(mode => `\`${mode}\``).join(', ')}, or \`${modes[modes.length - 1]}\`.`,
 	INVALID_SETTING: (settings: string[]) => `You haven't provided a valid setting to modify, try one of ${
 		settings.slice(0, -1).map(setting => `\`${setting}\``).join(', ')
-	}, or \`${settings[settings.length - 1]}\`.`
+	}, or \`${settings[settings.length - 1]}\`.`,
+	MENTION_MEMBER: (action: string, multiple = false) =>
+		`Please provide a valid member ${multiple ? 'or members ' : ''}to ${action}.`,
+	NOT_MANAGEABLE: (action: string, { byBot = false, single = true } = {}) =>
+		`${byBot ? 'I' : 'You'} cannot ${action} ${single ? 'that member' : 'one or more of those members'}.`,
+	SETUP_CONFIG: (prefix: string) => `This guild needs its config setup before using this command, use ${prefix}\`settings setup\``
 };
 
 export const URLs = {

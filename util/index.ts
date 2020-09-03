@@ -1,8 +1,8 @@
 import { promises as fs, stat as _stat } from 'fs';
 import * as nodeUtil from 'util';
 import * as path from 'path';
-import { Message, User, TextBasedChannelFields, GuildChannel } from 'discord.js';
-import { CommandResponses } from './Constants';
+import { Message, User, TextBasedChannelFields, GuildChannel, GuildMember, Guild } from 'discord.js';
+import { CommandResponses, SNOWFLAKE_REGEX } from './Constants';
 import { Error } from '../structures/SentinelError';
 const fileStats = nodeUtil.promisify(_stat);
 export default class Util {
@@ -116,4 +116,35 @@ export default class Util {
 		}
 		return current;
 	}
+  
+	static async extractMentions(string: string | string[], guild: Guild, limit: 1): Promise<SingleMentionData>;
+	static async extractMentions(string: string | string[], guild: Guild, limit: number) {
+		if (limit === 1) {
+			const [mention, ...rest] = typeof string === 'string' ? string.split(' ') : string;
+			const obj: SingleMentionData = { content: rest.join(' '), user: null, member: null };
+			const userID = mention.match(SNOWFLAKE_REGEX)?.[0];
+			console.log(userID);
+			if (!userID) return obj;
+			try {
+				obj.user = await guild.client.users.fetch(userID);
+				obj.member = await guild.members.fetch(obj.user);
+			} catch { } // eslint-disable-line no-empty
+			return obj;
+		}
+		throw null;
+	}
+
+	static isManageableBy(member: GuildMember, by: GuildMember) {
+		const { guild } = member;
+		if (by.id === guild.ownerID) return true;
+		if (member.id === guild.ownerID) return false;
+		if (by.roles.highest.rawPosition < member.roles.highest.rawPosition) return false;
+		return true;
+	}
+}
+
+interface SingleMentionData {
+  content: string;
+  user: User | null;
+  member: GuildMember | null;
 }
