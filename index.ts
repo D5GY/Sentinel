@@ -1,4 +1,5 @@
 import SentinelClient, { SentinelConfig } from './client/SentinelClient';
+import { Intents } from 'discord.js';
 import * as path from 'path';
 for (const structure of ['Guild', 'Message']) {
 	require(path.join(
@@ -25,7 +26,13 @@ const client = new SentinelClient(
 		partials: ['MESSAGE'],
 		presence: { activity: {
 			name: `Sentinel ${packageJSON ? `v${packageJSON.version}` : 'Unknown Version'}`
-		} }
+		} },
+		ws: {
+			intents: [
+				Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS,
+				Intents.FLAGS.GUILD_MESSAGES
+			]
+		}
 	}
 );
 client.on('ready', () => {
@@ -33,5 +40,5 @@ client.on('ready', () => {
 });
 client.on('error', console.error);
 client.on('warn', console.warn);
-if (config.PRODUCTION) client.on('debug', console.log);
+if (config.PRODUCTION) client.on('debug', console.info);
 client.connect();
