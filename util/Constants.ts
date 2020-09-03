@@ -248,8 +248,8 @@ export const CommandErrors = {
 	}, or \`${settings[settings.length - 1]}\`.`,
 	MENTION_MEMBER: (action: string, multiple = false) =>
 		`Please provide a valid member ${multiple ? 'or members ' : ''}to ${action}.`,
-	NOT_MANAGEABLE: (action: string, { byBot = false, single = true } = {}) =>
-		`${byBot ? 'I' : 'You'} cannot ${action} ${single ? 'that member' : 'one or more of those members'}.`,
+	NOT_MANAGEABLE: (action: ModerationTypes, { byBot = false, single = true } = {}) =>
+		`${byBot ? 'I' : 'You'} cannot ${ModerationTypes[action]} ${single ? 'that member' : 'one or more of those members'}.`,
 	SETUP_CONFIG: (prefix: string) => `This guild needs its config setup before using this command, use ${prefix}\`settings setup\``
 };
 
