@@ -18,10 +18,13 @@ const GUILD_PERMISSIONS = [
 	Permissions.FLAGS.VIEW_GUILD_INSIGHTS
 ];
 
+let MENTION_REGEX: RegExp | null = null;
+
 export default async function message(msg: Message) {
 	if (msg.author.bot || !msg.content.length) return;
 
 	const { client } = msg;
+	const edited = Boolean(msg.editedTimestamp);
 
 	try {
 		let prefix = client.config.defaultPrefix;
@@ -40,6 +43,13 @@ export default async function message(msg: Message) {
 			) {
 				const cont = await automod(msg);
 				if (!cont) return;
+			}
+		}
+    
+		if (!edited) {
+			if (!MENTION_REGEX) MENTION_REGEX = new RegExp(`^<@!?${client.user!.id}>$`);
+			if (MENTION_REGEX.test(msg.content)) {
+				return msg.channel.send(`My prefix is ${prefix}`);
 			}
 		}
 	
