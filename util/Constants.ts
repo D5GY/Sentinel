@@ -5,6 +5,7 @@ import * as moment from 'moment';
 export const DEFAULT_TIME_FORMAT = 'DD/MM/YYYY HH:mm:ss';
 export const SQL_SEARCH_REGEX = /:(\w+)/g;
 export const SNOWFLAKE_REGEX = /(\d{16,19})/g;
+export const INVITE_REGEX = /discord(?:(?:app)?\.com\/invite|\.gg(?:\/invite)?)\/([\w-]{2,255})/gi;
 
 const upperFirst = (string: string, lowerRest = true) => (
 	string.charAt(0).toUpperCase() + (lowerRest ? string.toLowerCase() : string).slice(1)
@@ -231,7 +232,13 @@ export const CommandResponses = {
 		return `${action === ModerationTypes.BAN ? 'Banned' : 'Kicked'} ${
 			users.length === 1 ? users[0].tag : `${users.length} Users`
 		} for ${reason ? insertFullStop(reason) : DEFAULT_REASON}`;
-	}
+	},
+	INVITES_NOT_ALLOWED: (user: User) => ({
+		allowedMentions: {
+			users: [user.id]
+		},
+		content: `Sorry ${user}, you're not allowed to send invites here!`
+	})
 };
 
 export const CommandErrors = {

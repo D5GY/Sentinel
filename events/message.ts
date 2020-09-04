@@ -2,6 +2,7 @@ import { Message, GuildChannel, TextChannel, Permissions } from 'discord.js';
 import CommandArguments from '../util/CommandArguments';
 import { getSend, DMPermissionsFunction, GuildPermissionsFunction } from '../util/BaseCommand';
 import CommandError from '../structures/CommandError';
+import Util from '../util';
 
 const GUILD_PERMISSIONS = [
 	Permissions.FLAGS.BAN_MEMBERS,
@@ -30,6 +31,16 @@ export default async function message(msg: Message) {
 			) return;
 			const config = await msg.guild.fetchConfig();
 			if (config.prefix) prefix = config.prefix;
+			if (
+				config.autoMod && !msg.member!.hasPermission(Permissions.FLAGS.ADMINISTRATOR) && (
+					!config.modRoleIDs || !config.modRoleIDs.some(roleID => msg.member!.roles.cache.has(roleID))
+				) && (
+					!config.adminRoleIDs || !config.adminRoleIDs.some(roleID => msg.member!.roles.cache.has(roleID))
+				)
+			) {
+				const cont = await automod(msg);
+				if (!cont) return;
+			}
 		}
 	
 		if (!msg.content.startsWith(prefix)) return;
@@ -83,4 +94,13 @@ export default async function message(msg: Message) {
 			`${error.name}: ${error.message}`
 		]).catch(error => client.emit('error', error));
 	}
+}
+
+async function automod(msg: Message) {
+	if (msg.invites) {
+		await msg.delete({ timeout: 50 });
+		await Util.respondWith(msg.channel, 'INVITES_NOT_ALLOWED', msg.author);
+		return false;
+	}
+	return true;
 }

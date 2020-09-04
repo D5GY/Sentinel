@@ -1,5 +1,6 @@
 import { Structures, Message } from 'discord.js';
 import Command from '../../util/BaseCommand';
+import { INVITE_REGEX } from '../../util/Constants';
 Structures.extend('Message', (DJSMessage) => 
 	class Message extends DJSMessage {
 		public lastCommand: LastCommandData | null = null;
@@ -17,6 +18,11 @@ Structures.extend('Message', (DJSMessage) =>
 				this.lastCommand.edits++;
 			}
 		}
+    
+		get invites(): string[] | null {
+			const invites = this.content.match(INVITE_REGEX);
+			return invites ? invites.map(url => url.split('/').pop()!) : null;
+		}
 	}
 );
 
@@ -28,7 +34,8 @@ interface LastCommandData {
 
 declare module 'discord.js' {
 	interface Message {
+    readonly invites: string[] | null;
 		lastCommand: LastCommandData | null;
-		setLastCommand(command: Command, response: Message): void;
+    setLastCommand(command: Command, response: Message): void;
 	}
 }

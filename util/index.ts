@@ -4,6 +4,7 @@ import * as path from 'path';
 import { Message, User, TextBasedChannelFields, GuildChannel, GuildMember, Guild } from 'discord.js';
 import { CommandResponses, SNOWFLAKE_REGEX } from './Constants';
 import { Error } from '../structures/SentinelError';
+import { PartialTextBasedChannelFields } from 'discord.js';
 const fileStats = nodeUtil.promisify(_stat);
 export default class Util {
 	static omitObject<T extends { [key: string]: any }, K extends keyof T>(
@@ -40,7 +41,7 @@ export default class Util {
 	}
 
 	static respondWith<T extends keyof typeof CommandResponses>(
-		channel: TextBasedChannelFields,
+		channel: PartialTextBasedChannelFields,
 		responseName: T,
 		...options: Parameters<(typeof CommandResponses)[T]>
 	) {
