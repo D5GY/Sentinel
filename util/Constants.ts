@@ -238,7 +238,14 @@ export const CommandResponses = {
 			users: [user.id]
 		},
 		content: `Sorry ${user}, you're not allowed to send invites here!`
-	})
+	}),
+	CLIENT_INVITE: () => {
+		return new MessageEmbed()
+			.setColor(SentinelColors.LIGHT_BLUE)
+			.setTitle('Thank you for choosing Sentinel.')
+			.setDescription('Click [HERE](https://discord.com/api/oauth2/authorize?client_id=739203261797498953&permissions=6&scope=bot) to invite Sentinel')
+			.setTimestamp();
+	}
 };
 
 export const CommandErrors = {
