@@ -247,6 +247,14 @@ export const CommandResponses = {
 			.setTitle('Thank you for choosing Sentinel.')
 			.setDescription(`Click [HERE](${invite}) to invite Sentinel`)
 			.setTimestamp();
+	},
+	HELP_PAGE: (desc: string[] | string, index = 1, maxPages = index) => {
+		return new MessageEmbed()
+			.setColor(SentinelColors.LIGHT_BLUE)
+			.setAuthor(`Page ${index}/${maxPages}`)
+			.setDescription(desc)
+			.setFooter('Sentinel | <> = Not Required | [] = Required')
+			.setTimestamp();
 	}
 };
 

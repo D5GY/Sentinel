@@ -21,7 +21,9 @@ export default class EvalCommand extends Command {
 			name: 'eval',
 			permissions: (user) => {
 				return user.client.config.devs.includes(user.id);
-			}
+			},
+			description: 'Evaluates code.',
+			usage: '[code]'
 		}, __filename);
 	}
 

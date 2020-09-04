@@ -8,7 +8,8 @@ export default class InviteCommand extends Command {
 		super(client, {
 			aliases: [],
 			name: 'invite',
-			dmAllowed: true
+			dmAllowed: true,
+			description: 'Generates an invite link for this bot.'
 		}, __filename);
 	}
 

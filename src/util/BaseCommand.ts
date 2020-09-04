@@ -14,6 +14,7 @@ export default class Command {
 	public usage: string;
 	public dmAllowed: boolean;
 	public permissions?: number | DMPermissionsFunction | GuildPermissionsFunction;
+	public description: string;
 
 	constructor(client: SentinelClient, data: CommandData, path: string) {
 		Object.defineProperty(this, 'client', { value: client });
@@ -21,6 +22,7 @@ export default class Command {
 		this.aliases = data.aliases ?? [];
 		this.name = data.name;
 		this.usage = data.usage ?? '';
+		this.description = data.description;
 		this.dmAllowed = data.dmAllowed ?? false;
 		if (data.permissions) {
 			this.permissions = typeof data.permissions === 'function'
@@ -36,6 +38,19 @@ export default class Command {
 		if (this.clientPermissions !== null) this.clientPermissions.freeze();
 	}
 
+	static hasPermissions(command: Command, message: Message) {
+		if (!command.permissions) return true;
+		let hasPermission: string | boolean | null = true;
+		if (typeof command.permissions === 'function') {
+			hasPermission = message.guild
+				? (command.permissions as GuildPermissionsFunction)(message.member!, message.channel as TextChannel)
+				: (command.permissions as DMPermissionsFunction)(message.author, message.member, message.channel);
+		} else if (typeof command.permissions === 'number') {
+			hasPermission = message.member!.hasPermission(command.permissions);
+		}
+		return hasPermission;
+	}
+
 	async run(message: Message, args: CommandArguments, send: SendFunction) {
 		await send('NO_IMPLEMENTATION', args);
 	}
@@ -46,6 +61,7 @@ export type CommandData = {
   clientPermissions?: PermissionResolvable;
 	name: string;
 	usage?: string;
+	description: string;
 } & ({
 	dmAllowed: false;
 	permissions?: PermissionResolvable | GuildPermissionsFunction;

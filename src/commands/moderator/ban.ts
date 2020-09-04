@@ -18,7 +18,9 @@ export default class BanCommand extends Command {
 				if (member.hasPermission(Permissions.FLAGS.BAN_MEMBERS)) return true;
 				if (config.modRoleIDs?.some(id => member.roles.cache.has(id))) return true;
 				return 'You need to be a Server Moderator to use this command!';
-			}
+			},
+			description: 'Ban a user.',
+			usage: '[member] <reason>'
 		}, __filename);
 	}
 
