@@ -130,6 +130,7 @@ export const CommandResponses = {
 			});
 	},
 	GUILD_CREATE_LOG: (guild: Guild) => {
+		const owner = guild.client.users.cache.get(guild.ownerID);
 		const embed = new MessageEmbed()
 			.setColor(SentinelColors.GREEN)
 			.setDescription('New guild added')
@@ -140,7 +141,7 @@ export const CommandResponses = {
 				value: `${guild.name} / ${guild.id}`
 			}, {
 				name: 'Guild Owner',
-				value: guild.owner ? formatUser(guild.owner.user) : guild.ownerID
+				value: owner ? formatUser(owner) : guild.ownerID
 			}, {
 				name: 'Member Count',
 				value: `Members: ${guild.memberCount}`
@@ -150,6 +151,7 @@ export const CommandResponses = {
 		return embed;
 	},
 	GUILD_REMOVE_LOG: (guild: Guild) => {
+		const owner = guild.client.users.cache.get(guild.ownerID);
 		const embed = new MessageEmbed()
 			.setColor(SentinelColors.RED)
 			.setDescription('Bot removed from guild')
@@ -160,7 +162,7 @@ export const CommandResponses = {
 				value: `${guild.name} / ${guild.id}`
 			}, {
 				name: 'Guild Owner',
-				value: guild.owner ? formatUser(guild.owner.user) : guild.ownerID
+				value: owner ? formatUser(owner) : guild.ownerID
 			}, {
 				name: 'Member Count',
 				value: `Members: ${guild.memberCount}`
