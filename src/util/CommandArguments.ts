@@ -43,7 +43,7 @@ export default class CommandArguments extends Array<string> {
 	}
 
 	slice(start?: number, end?: number) {
-		const args = [...this].slice(start, end);
+		const args = [...this.values()].slice(start, end);
 		const regular = this.regular.slice(start, end);
 		return new CommandArguments(this._message, args, regular);
 	}
