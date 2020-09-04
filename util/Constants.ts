@@ -240,7 +240,14 @@ export const CommandResponses = {
 			users: [user.id]
 		},
 		content: `Sorry ${user}, you're not allowed to send invites here!`
-	})
+	}),
+	CLIENT_INVITE: (invite: String) => {
+		return new MessageEmbed()
+			.setColor(SentinelColors.LIGHT_BLUE)
+			.setTitle('Thank you for choosing Sentinel.')
+			.setDescription(`Click [HERE](${invite}) to invite Sentinel`)
+			.setTimestamp();
+	}
 };
 
 export const CommandErrors = {
