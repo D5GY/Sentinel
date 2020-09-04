@@ -9,7 +9,7 @@ import { SQLValues } from '../../client/database/DatabaseManager';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 const util: typeof import('util') = require('util');
-const djs: typeof import('discord.js') = require('discord.js');
+const djs: typeof import('discord.js') = require('../../src/structures/node_modules/discord.js.js');
 const fetch: typeof import('node-fetch').default = require('node-fetch');
 const Util: typeof import('../../util').default = require('../../util').default;
 
