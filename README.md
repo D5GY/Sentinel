@@ -1,5 +1,5 @@
 # Sentinel
-Sentinel is a multi purpose discord bot. This bot will offer many features such
+Sentinel is a multi purpose discord bot. This bot will offer many features such as:
 - Auto-Moderation
 - Moderation Commands
 - Economy Commands (WIP)
