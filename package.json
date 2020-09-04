@@ -1,7 +1,7 @@
 {
 	"name": "sentinel",
 	"version": "1.0.0-dev",
-	"description": "",
+	"description": "Sentinel Bot",
 	"main": "index.js",
 	"dependencies": {
 		"@types/mysql": "^2.15.15",
@@ -28,7 +28,7 @@
 		"url": "git+https://github.com/Dev-Jinx/Sentinel.git"
 	},
 	"author": "",
-	"license": "ISC",
+	"license": "Apache-2.0",
 	"bugs": {
 		"url": "https://github.com/Dev-Jinx/Sentinel/issues"
 	},
