@@ -1,4 +1,4 @@
-import { Message, GuildChannel, TextChannel, Permissions } from 'discord.js';
+import { Message, TextChannel, Permissions } from 'discord.js';
 import CommandArguments from '../util/CommandArguments';
 import { getSend, DMPermissionsFunction, GuildPermissionsFunction } from '../util/BaseCommand';
 import CommandError from '../structures/CommandError';
@@ -29,9 +29,6 @@ export default async function message(msg: Message) {
 	try {
 		let prefix = client.config.defaultPrefix;
 		if (msg.guild) {
-			if (
-				!(msg.channel as GuildChannel).permissionsFor(client.user!)!.has('SEND_MESSAGES')
-			) return;
 			const config = await msg.guild.fetchConfig();
 			if (config.prefix) prefix = config.prefix;
 			if (
@@ -49,7 +46,7 @@ export default async function message(msg: Message) {
 		if (!edited) {
 			if (!MENTION_REGEX) MENTION_REGEX = new RegExp(`^<@!?${client.user!.id}>$`);
 			if (MENTION_REGEX.test(msg.content)) {
-				return msg.channel.send(`My prefix is ${prefix}`);
+				return msg.channel.send(`My prefix is \`${prefix}\``);
 			}
 		}
 	
