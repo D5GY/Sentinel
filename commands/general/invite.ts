@@ -1,9 +1,7 @@
 import Command, { SendFunction } from '../../util/BaseCommand';
 import SentinelClient from '../../client/SentinelClient';
-
-import { Message } from 'discord.js';
+import { Message, Permissions } from 'discord.js';
 import CommandArguments from '../../util/CommandArguments';
-import { Permissions } from 'discord.js';
 
 export default class InviteCommand extends Command {
 	constructor(client: SentinelClient) {
