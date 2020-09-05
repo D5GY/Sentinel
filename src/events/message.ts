@@ -1,6 +1,6 @@
 import { Message, TextChannel, Permissions } from 'discord.js';
 import CommandArguments from '../util/CommandArguments';
-import { getSend, DMPermissionsFunction, GuildPermissionsFunction } from '../util/BaseCommand';
+import Command, { getSend } from '../util/BaseCommand';
 import CommandError from '../structures/CommandError';
 import Util from '../util';
 
@@ -74,19 +74,12 @@ export default async function message(msg: Message) {
 				return send('CLIENT_MISSING_PERMISSIONS', clientPermissions, guildPermissions);
 			}
 		}
-		if (command.permissions !== 0) {
-			let hasPermission: string | boolean | null = true;
-			if (typeof command.permissions === 'function') {
-				hasPermission = msg.guild
-					? (command.permissions as GuildPermissionsFunction)(msg.member!, msg.channel as TextChannel)
-					: (command.permissions as DMPermissionsFunction)(msg.author, msg.member, msg.channel);
-			} else if (typeof command.permissions === 'number') {
-				hasPermission = msg.member!.hasPermission(command.permissions);
-			}
-			if (hasPermission === false) throw new CommandError('NO_PERMISSION', send);
-			else if (typeof hasPermission === 'string') {
-				return send({ content: hasPermission });
-			} else if (hasPermission === null) return;
+		const hasPermissions = Command.hasPermissions(command, msg);
+		if (hasPermissions !== true) {
+			if (hasPermissions === false) throw new CommandError('NO_PERMISSION', send);
+			else if (typeof hasPermissions === 'string') {
+				return send({ content: hasPermissions });
+			} else if (hasPermissions === null) return;
 		} 
 		await command.run(msg, args, send);
 	} catch (error) {

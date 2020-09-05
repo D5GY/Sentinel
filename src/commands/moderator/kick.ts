@@ -18,7 +18,9 @@ export default class KickCommand extends Command {
 				if (member.hasPermission(Permissions.FLAGS.KICK_MEMBERS)) return true;
 				if (config.modRoleIDs?.some(id => member.roles.cache.has(id))) return true;
 				return 'You need to be a Server Moderator to use this command!';
-			}
+			},
+			description: 'Kick a user.',
+			usage: '[member] <reason>'
 		}, __filename);
 	}
 

@@ -79,7 +79,9 @@ export default class SettingsCommand extends Command {
 				if (!config) return null;
 				if (config.adminRoleIDs?.some(id => member.roles.cache.has(id))) return true;
 				return 'You need to be a Server Admin to use this command!';
-			}
+			},
+			description: 'Views, changes, or setups the config.',
+			usage: '<\'setup\' | \'edit\' [setting] [new value]>'
 		}, __filename);
 	}
 
