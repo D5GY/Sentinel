@@ -1,21 +1,28 @@
 import GuildConfig from '../structures/GuildConfig';
 import { MessageEmbed, GuildMember, Guild, Message, StringResolvable, Util as DJSUtil, PartialMessage, Permissions, User } from 'discord.js';
 import * as moment from 'moment';
+import { PermissionString } from 'discord.js';
 
 export const DEFAULT_TIME_FORMAT = 'DD/MM/YYYY HH:mm:ss';
 export const SQL_SEARCH_REGEX = /:(\w+)/g;
 export const SNOWFLAKE_REGEX = /(\d{16,19})/g;
 export const INVITE_REGEX = /discord(?:(?:app)?\.com\/invite|\.gg(?:\/invite)?)\/([\w-]{2,255})/gi;
 
-const upperFirst = (string: string, lowerRest = true) => (
+export const SEND_MESSAGE_PERMISSIONS = Permissions.resolve([
+	Permissions.FLAGS.SEND_MESSAGES, Permissions.FLAGS.VIEW_CHANNEL
+]);
+
+export const upperFirst = (string: string, lowerRest = true) => (
 	string.charAt(0).toUpperCase() + (lowerRest ? string.toLowerCase() : string).slice(1)
 );
-const cleanPermissions = (perms: Permissions) => perms.toArray().map(
+export const cleanPermissions = (perms: Permissions | PermissionString[]) => (
+	Array.isArray(perms) ? perms : perms.toArray()
+).map(
 	perm => `\`${upperFirst(perm.toLowerCase().replace(/_(.)/g, (str, match) => ` ${match.toUpperCase()}`), false)}\``
 ).join(', ');
-const plural = (word: string, bool: boolean) => `${word}${bool ? 's' : ''}`;
-const formatUser = (user: User) => `${user} ${user.tag} (${user.id})`;
-const insertFullStop = (str: string) => str.endsWith('.') ? str : `${str}.`;
+export const plural = (word: string, bool: boolean) => `${word}${bool ? 's' : ''}`;
+export const formatUser = (user: User) => `${user} ${user.tag} (${user.id})`;
+export const insertFullStop = (str: string) => str.endsWith('.') ? str : `${str}.`;
 
 export enum SQLQueryTypes {
 	INSERT = 'INSERT',

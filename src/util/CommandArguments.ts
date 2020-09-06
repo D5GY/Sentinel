@@ -2,9 +2,9 @@ import { Message, Snowflake } from 'discord.js';
 
 const MENTION_REGEX = /<(@!?|@&|#)([0-9]{17,19})>/g;
 const cleanContent = (message: Message) => {
-	return message.content.toLowerCase().split(' ').reduce((args, argument) => {
+	return message.content.toLowerCase().split(' ').reduce<string[]>((args, argument) => {
 		const matches = [...argument.matchAll(MENTION_REGEX)]
-			.map(([, type, id]) => [type, id] as ['@!' | '@&' | '@' | '#', Snowflake]);
+			.map(([, type, id]) => <['@!' | '@&' | '@' | '#', Snowflake]> [type, id]);
 		if (matches.length) {
 			let newArg = '';
 			for (const [type, id] of matches) {
@@ -26,7 +26,7 @@ const cleanContent = (message: Message) => {
 			args.push(newArg);
 		} else args.push(argument);
 		return args;
-	}, [] as string[]);
+	}, []);
 };
 
 export default class CommandArguments extends Array<string> {

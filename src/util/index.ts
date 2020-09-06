@@ -1,10 +1,9 @@
 import { promises as fs, stat as _stat } from 'fs';
 import * as nodeUtil from 'util';
 import * as path from 'path';
-import { Message, User, TextBasedChannelFields, GuildChannel, GuildMember, Guild } from 'discord.js';
+import { Message, User, TextBasedChannelFields, GuildChannel, GuildMember, Guild, PartialTextBasedChannelFields, DMChannel } from 'discord.js';
 import { CommandResponses, SNOWFLAKE_REGEX } from './Constants';
 import { Error } from '../structures/SentinelError';
-import { PartialTextBasedChannelFields } from 'discord.js';
 const fileStats = nodeUtil.promisify(_stat);
 export default class Util {
 	static omitObject<T extends { [key: string]: any }, K extends keyof T>(
@@ -12,10 +11,10 @@ export default class Util {
 	): Omit<T, K> {
 		const newObj: { [key: string]: any } = {};
 		for (const [key, value] of Object.entries(object)) {
-			if (keys.includes(key as K)) continue;
+			if (keys.includes(<K> key)) continue;
 			newObj[key] = value;
 		}
-		return newObj as { [K in keyof T]: T[K] };
+		return <{ [K in keyof T]: T[K] }> newObj;
 	}
 
 	static async readdirRecursive(directory: string | string[], filter = (filePath: string) => filePath.includes('.js')) {
@@ -47,7 +46,7 @@ export default class Util {
 	) {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		const response = CommandResponses[responseName as keyof typeof CommandResponses](...options);
+		const response = CommandResponses[<keyof typeof CommandResponses> responseName](...options);
 		return channel.send(response);
 	}
 
@@ -87,10 +86,10 @@ export default class Util {
 		const forcedChannel = msg.mentions.channels.first()
 			|| msg.guild!.channels.cache.get(string);
 		if (forcedChannel) return (!types || types.includes(forcedChannel.type))
-			? forcedChannel as T : null;
-		return msg.guild!.channels.cache.find(
+			? <T> forcedChannel : null;
+		return <T | undefined> msg.guild!.channels.cache.find(
 			ch => (!types || types.includes(ch.type)) && (ch.name.toLowerCase() === string)
-		) as T | undefined || null;
+		) || null;
 	}
 
 	static getProp(
@@ -142,6 +141,15 @@ export default class Util {
 		if (by.roles.highest.rawPosition < member.roles.highest.rawPosition) return false;
 		return true;
 	}
+
+	static isGuildMessage(message: Message): message is GuildMessage {
+		return Boolean(message.guild);
+	}
+}
+
+interface GuildMessage extends Message {
+	channel: Exclude<Message['channel'], DMChannel>;
+	guild: Guild;
 }
 
 interface SingleMentionData {

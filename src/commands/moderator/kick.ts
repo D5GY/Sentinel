@@ -16,7 +16,11 @@ export default class KickCommand extends Command {
 				const { guild: { config } } = member;
 				if (!config) return null;
 				if (member.hasPermission(Permissions.FLAGS.KICK_MEMBERS)) return true;
-				if (config.modRoleIDs?.some(id => member.roles.cache.has(id))) return true;
+				const fn = (id: string) => member.roles.cache.has(id);
+				if (
+					member.client.config.devs.includes(member.id) ||
+					config.modRoleIDs?.some(fn) || config.adminRoleIDs?.some(fn)
+				) return true;
 				return 'You need to be a Server Moderator to use this command!';
 			},
 			description: 'Kick a user.',
