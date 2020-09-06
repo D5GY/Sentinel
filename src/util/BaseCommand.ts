@@ -43,8 +43,8 @@ export default class Command {
 		let hasPermission: string | boolean | null = true;
 		if (typeof command.permissions === 'function') {
 			hasPermission = message.guild
-				? (command.permissions as GuildPermissionsFunction)(message.member!, message.channel as TextChannel)
-				: (command.permissions as DMPermissionsFunction)(message.author, message.member, message.channel);
+				? (<GuildPermissionsFunction> command.permissions)(message.member!, <TextChannel> message.channel)
+				: (<DMPermissionsFunction> command.permissions)(message.author, message.member, message.channel);
 		} else if (typeof command.permissions === 'number') {
 			hasPermission = message.member!.hasPermission(command.permissions);
 		}
@@ -87,7 +87,7 @@ export function getSend(message: Message, command: Command) {
 		...options: any[]
 	) {
 		if (typeof content === 'string') {
-			const response = CommandResponses[content as keyof typeof CommandResponses];
+			const response = CommandResponses[<keyof typeof CommandResponses> content];
 			if (typeof response === 'function') {
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore
