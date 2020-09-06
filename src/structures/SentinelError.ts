@@ -15,11 +15,10 @@ const makeError = (Class: typeof Error) => {
 		) {
 			super();
 			this.code = name;
-			const message = Errors[name] as (
-				(...args: (typeof Errors)[T] extends Function ?
-					Parameters<(typeof Errors)[T]> :
-					never[]
-				) => string);
+			const message = <((...args: (typeof Errors)[T] extends Function
+				? Parameters<(typeof Errors)[T]>
+				: never[]
+			) => string)> Errors[name];
 			this.message = message(...extras);
 		}
 

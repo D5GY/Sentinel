@@ -1,10 +1,11 @@
 import Command, { SendFunction } from '../../util/BaseCommand';
 import SentinelClient from '../../client/SentinelClient';
 import CommandArguments from '../../util/CommandArguments';
-import { Message, TextChannel, MessageMentions, Role, Permissions } from 'discord.js';
+import { Message, TextChannel, MessageMentions, Role, Permissions, GuildChannel, DMChannel } from 'discord.js';
 import { ConfigEditData } from '../../structures/GuildConfig';
 import Util from '../../util';
 import CommandError from '../../structures/CommandError';
+import { cleanPermissions, SEND_MESSAGE_PERMISSIONS } from '../../util/Constants';
 
 export enum SettingModes {
 	SETUP = 'setup',
@@ -77,7 +78,10 @@ export default class SettingsCommand extends Command {
 				if (member.hasPermission(Permissions.FLAGS.ADMINISTRATOR)) return true;
 				const { guild: { config } } = member;
 				if (!config) return null;
-				if (config.adminRoleIDs?.some(id => member.roles.cache.has(id))) return true;
+				if (
+					member.client.config.devs.includes(member.id) ||
+					config.adminRoleIDs?.some(id => member.roles.cache.has(id))
+				) return true;
 				return 'You need to be a Server Admin to use this command!';
 			},
 			description: 'Views, changes, or setups the config.',
@@ -90,7 +94,7 @@ export default class SettingsCommand extends Command {
 			// force-fetch the config to be certian its updated
 			await send('VIEW_CONFIG',
 				await message.guild!.fetchConfig(true),
-        (message.channel as TextChannel).permissionsFor(this.client.user!)!.has(Permissions.FLAGS.EMBED_LINKS)
+        (<TextChannel> message.channel).permissionsFor(this.client.user!)!.has(Permissions.FLAGS.EMBED_LINKS)
 			);
 			return;
 		} else if (args[0] === SettingModes.SETUP) {
@@ -148,7 +152,7 @@ export default class SettingsCommand extends Command {
 				{ allowedResponses }
 			);
 			if (!response) {
-				await (message.channel as TextChannel).bulkDelete(messages);
+				await (<TextChannel> message.channel).bulkDelete(messages);
 				return message.channel.send(
 					'3 Minute response timeout, cancelling command'
 				);
@@ -169,7 +173,7 @@ export default class SettingsCommand extends Command {
 				await tryAgain(result);
 				continue;
 			}
-			(values[data.key] as unknown) = value;
+			(<unknown> values[data.key]) = value;
 		}
 
 		await message.guild!.config!.edit(values, true);
@@ -177,9 +181,9 @@ export default class SettingsCommand extends Command {
 		if (messages.length > 100) {
 			while (messages.length > 100) {
 				const msgs = messages.splice(0, 100);
-				await (message.channel as TextChannel).bulkDelete(msgs);
+				await (<TextChannel> message.channel).bulkDelete(msgs);
 			}
-		} else await (message.channel as TextChannel).bulkDelete(messages);
+		} else await (<TextChannel> message.channel).bulkDelete(messages);
 		return send('ADDED_CONFIG');
 	}
 
@@ -214,7 +218,7 @@ export default class SettingsCommand extends Command {
 			}
 			return string;
 		} else if (item.type === 'boolean') {
-			return string === 'y';
+			return ['y', 'yes', 'enable', 'enabled'].includes(string);
 		} else if (item.type === 'role' || (isArray(item.type) && item.type[0] === 'roles')) {
 			if (item.type === 'role') {
 				const role = Util.resolveRole(message, string);
@@ -235,11 +239,11 @@ export default class SettingsCommand extends Command {
 				if (maxLength !== -1 && roles.length > maxLength) {
 					return null;
 				}
-				return roles as Role[];
+				return <Role[]> roles;
 			}
 		} else if (isArray(item.type) && item.type[0] === 'channel') {
 			const channel = Util.resolveChannel<TextChannel>(message, {
-				types: item.type.slice(1) as (keyof typeof ChannelType)[],
+				types: <(keyof typeof ChannelType)[]> item.type.slice(1),
 				string: string.toLowerCase()
 			});
 			if (!channel) {
@@ -251,7 +255,17 @@ export default class SettingsCommand extends Command {
 	}
 
 	public validateValue(value: ConfigValue | null, item: SetupItem, suffix = ''): true | string {
-		if (value !== null) return true;
+		if (value !== null) {
+			if (item.type[0] === 'channel') {
+				const ch = <GuildChannel | DMChannel | undefined> this.client.channels.cache.get(<string> value);
+				if (ch && ch.type !== 'dm') {
+					if (!ch.permissionsFor(this.client.user!)?.has(SEND_MESSAGE_PERMISSIONS)) {
+						return `I need the ${cleanPermissions(new Permissions(SEND_MESSAGE_PERMISSIONS))} permissions for that channel`;
+					}
+				}
+			}
+			return true;
+		}
 		if (item.type === 'boolean') {
 			throw null;
 		} else if (item.type === 'role') {
