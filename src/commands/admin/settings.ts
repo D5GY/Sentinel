@@ -1,12 +1,10 @@
 import Command, { SendFunction } from '../../util/BaseCommand';
 import SentinelClient from '../../client/SentinelClient';
 import CommandArguments from '../../util/CommandArguments';
-import { Message, TextChannel, MessageMentions, Role, Permissions } from 'discord.js';
+import { Message, TextChannel, MessageMentions, Role, Permissions, GuildChannel, DMChannel } from 'discord.js';
 import { ConfigEditData } from '../../structures/GuildConfig';
 import Util from '../../util';
 import CommandError from '../../structures/CommandError';
-import { GuildChannel } from 'discord.js';
-import { DMChannel } from 'discord.js';
 import { cleanPermissions, SEND_MESSAGE_PERMISSIONS } from '../../util/Constants';
 
 export enum SettingModes {
