@@ -270,7 +270,7 @@ export const CommandResponses = {
 			.setTimestamp()
 			.addFields({
 				name: 'Message Author',
-				value: user.tag
+				value: formatUser(user)
 			}, {
 				name: 'Suggestion',
 				value: content
@@ -295,7 +295,7 @@ export const CommandErrors = {
 	NOT_MANAGEABLE: (action: ModerationTypes, { byBot = false, single = true } = {}) =>
 		`${byBot ? 'I' : 'You'} cannot ${ModerationTypes[action]} ${single ? 'that member' : 'one or more of those members'}.`,
 	SETUP_CONFIG: (prefix: string) => `This guild needs its config setup before using this command, use ${prefix}\`settings setup\``,
-	PROVIDE_SUGGESTION: () => 'Please provide a suggestion!',
+	PROVIDE_SUGGESTION: () => 'Please provide something to suggest!',
 	MAX_MESSAGE_LENGTH: () => 'Suggestion was to long!'
 };
 
