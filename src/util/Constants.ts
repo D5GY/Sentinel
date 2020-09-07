@@ -261,13 +261,27 @@ export const CommandResponses = {
 			.setDescription(desc)
 			.setFooter('Sentinel | <> = Not Required | [] = Required')
 			.setTimestamp();
+	},
+	SUGGESTION_RESPONSE: () => 'Thank you for your suggestion, my developers will look into this!',
+	SUGGESTION_LOG: (user: User, content: string) => {
+		return new MessageEmbed()
+			.setColor(SentinelColors.LIGHT_BLUE)
+			.setAuthor('Sentinel New Suggestion')
+			.setTimestamp()
+			.addFields({
+				name: 'Message Author',
+				value: user.tag
+			}, {
+				name: 'Suggestion',
+				value: content
+			});
 	}
 };
 
 export const CommandErrors = {
 	CUSTOM_MESSAGE: (message: StringResolvable) => DJSUtil.resolveString(message),
 	NO_PERMISSION: (message?: string) => message ?? 'You don\'t have permissions to use this command!',
-	SAY_NO_ARGS: () => 'Please provide something to say!',
+	SAY_NO_ARGS: () => 'Please provide',
 	INVALID_MODE: (modes: string[], provided?: string) => `${
 		provided
 			? `Mode \`${provided}\` is not a valid mode for this command`
@@ -280,7 +294,8 @@ export const CommandErrors = {
 		`Please provide a valid member ${multiple ? 'or members ' : ''}to ${action}.`,
 	NOT_MANAGEABLE: (action: ModerationTypes, { byBot = false, single = true } = {}) =>
 		`${byBot ? 'I' : 'You'} cannot ${ModerationTypes[action]} ${single ? 'that member' : 'one or more of those members'}.`,
-	SETUP_CONFIG: (prefix: string) => `This guild needs its config setup before using this command, use ${prefix}\`settings setup\``
+	SETUP_CONFIG: (prefix: string) => `This guild needs its config setup before using this command, use ${prefix}\`settings setup\``,
+	PROVIDE_SUGGESTION: () => 'Please provide a suggestion!'
 };
 
 export const URLs = {
