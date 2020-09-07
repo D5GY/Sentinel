@@ -281,7 +281,7 @@ export const CommandResponses = {
 export const CommandErrors = {
 	CUSTOM_MESSAGE: (message: StringResolvable) => DJSUtil.resolveString(message),
 	NO_PERMISSION: (message?: string) => message ?? 'You don\'t have permissions to use this command!',
-	SAY_NO_ARGS: () => 'Please provide',
+	SAY_NO_ARGS: () => 'Please provide something to say!',
 	INVALID_MODE: (modes: string[], provided?: string) => `${
 		provided
 			? `Mode \`${provided}\` is not a valid mode for this command`
