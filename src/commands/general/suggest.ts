@@ -16,8 +16,7 @@ export default class InviteCommand extends Command {
 	}
 
 	async run(message: Message,  args: CommandArguments, send: SendFunction) {
-		const noSuggestion = new CommandError('PROVIDE_SUGGESTION');
-		if(!args[0]) throw noSuggestion;
+		if(!args[0]) throw new CommandError('PROVIDE_SUGGESTION');
 		const content = args.slice(0).join(' ');
 		await send('SUGGESTION_RESPONSE');
 		await Util.respondWith(this.client.config.suggestionsChannel!, 'SUGGESTION_LOG', message.author, content);
