@@ -5,7 +5,7 @@ import CommandArguments from '../../util/CommandArguments';
 import CommandError from '../../structures/CommandError';
 import Util from '../../util';
 
-export default class InviteCommand extends Command {
+export default class SuggestCommand extends Command {
 	constructor(client: SentinelClient) {
 		super(client, {
 			aliases: [],
