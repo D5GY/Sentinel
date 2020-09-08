@@ -296,7 +296,7 @@ export const CommandErrors = {
 		`${byBot ? 'I' : 'You'} cannot ${ModerationTypes[action]} ${single ? 'that member' : 'one or more of those members'}.`,
 	SETUP_CONFIG: (prefix: string) => `This guild needs its config setup before using this command, use ${prefix}\`settings setup\``,
 	PROVIDE_SUGGESTION: () => 'Please provide something to suggest!',
-	MAX_MESSAGE_LENGTH: () => 'Suggestion was to long!'
+	SUGGESTION_LENGTH: () => 'Suggestion was to long!'
 };
 
 export const URLs = {
