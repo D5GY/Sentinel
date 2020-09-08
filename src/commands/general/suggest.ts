@@ -17,9 +17,9 @@ export default class InviteCommand extends Command {
 
 	async run(message: Message,  args: CommandArguments, send: SendFunction) {
 		if (!args[0]) throw new CommandError('PROVIDE_SUGGESTION');
-		const content = args.join(' ');
-		if (content.length >= 1024) throw new CommandError('SUGGESTION_LENGTH');
+		const suggestion = args.join(' ');
+		if (suggestion.length >= 1024) throw new CommandError('SUGGESTION_LENGTH');
 		await send('SUGGESTION_RESPONSE');
-		await Util.respondWith(this.client.config.suggestionsChannel!, 'SUGGESTION_LOG', message.author, content);
+		await Util.respondWith(this.client.config.suggestionsChannel!, 'SUGGESTION_LOG', message.author, suggestion);
 	}
 }

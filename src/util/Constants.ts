@@ -263,17 +263,17 @@ export const CommandResponses = {
 			.setTimestamp();
 	},
 	SUGGESTION_RESPONSE: () => 'Thank you for your suggestion, my developers will look into this!',
-	SUGGESTION_LOG: (user: User, content: string) => {
+	SUGGESTION_LOG: (user: User, suggestion: string) => {
 		return new MessageEmbed()
 			.setColor(SentinelColors.LIGHT_BLUE)
 			.setAuthor('Sentinel New Suggestion')
 			.setTimestamp()
 			.addFields({
-				name: 'Message Author',
+				name: 'Suggested By',
 				value: formatUser(user)
 			}, {
 				name: 'Suggestion',
-				value: content
+				value: suggestion
 			});
 	}
 };
@@ -296,7 +296,7 @@ export const CommandErrors = {
 		`${byBot ? 'I' : 'You'} cannot ${ModerationTypes[action]} ${single ? 'that member' : 'one or more of those members'}.`,
 	SETUP_CONFIG: (prefix: string) => `This guild needs its config setup before using this command, use ${prefix}\`settings setup\``,
 	PROVIDE_SUGGESTION: () => 'Please provide something to suggest!',
-	SUGGESTION_LENGTH: () => 'Suggestion was to long!'
+	SUGGESTION_LENGTH: () => 'That suggestion was too long, the max length is 1024 characters'
 };
 
 export const URLs = {
