@@ -266,7 +266,7 @@ export const CommandResponses = {
 	SUGGESTION_LOG: (user: User, suggestion: string) => {
 		return new MessageEmbed()
 			.setColor(SentinelColors.LIGHT_BLUE)
-			.setAuthor('Sentinel New Suggestion')
+			.setAuthor('New Suggestion')
 			.setTimestamp()
 			.addFields({
 				name: 'Suggested By',
