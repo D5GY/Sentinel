@@ -4,7 +4,7 @@ const MENTION_REGEX = /<(@!?|@&|#)([0-9]{17,19})>/g;
 const cleanContent = (message: Message) => {
 	return message.content.toLowerCase().split(' ').reduce<string[]>((args, argument) => {
 		const matches = [...argument.matchAll(MENTION_REGEX)]
-			.map(([, type, id]) => <['@!' | '@&' | '@' | '#', Snowflake]>[type, id]);
+			.map(([, type, id]) => <['@!' | '@&' | '@' | '#', Snowflake]> [type, id]);
 		if (matches.length) {
 			let newArg = '';
 			for (const [type, id] of matches) {

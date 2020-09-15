@@ -94,7 +94,7 @@ export default class SettingsCommand extends Command {
 			// force-fetch the config to be certian its updated
 			await send('VIEW_CONFIG',
 				await message.guild!.fetchConfig(true),
-				(<TextChannel>message.channel).permissionsFor(this.client.user!)!.has(Permissions.FLAGS.EMBED_LINKS)
+				(<TextChannel> message.channel).permissionsFor(this.client.user!)!.has(Permissions.FLAGS.EMBED_LINKS)
 			);
 			return;
 		} else if (args[0] === SettingModes.SETUP) {
@@ -121,14 +121,17 @@ export default class SettingsCommand extends Command {
 				allowedResponses = '*';
 				if (data.type === 'role') type = 'a role (name/mention/id)';
 				else if (data.type[0] === 'roles') {
-					type = `${(typeof data.type[1] === 'number' && data.type[1] !== -1)
-						? data.type[1] : 'multiple'
+					type = `${
+						(typeof data.type[1] === 'number' && data.type[1] !== -1)
+							? data.type[1] : 'multiple'
 					} roles (name/mention/id) seperated by a comma`;
 				} else if (data.type[0] === 'string') {
-					type = `a string of characters${data.type[1] !== -1 ? `, max length ${data.type[1]}` : ''}`;
+					type = `a string of characters${
+						data.type[1] !== -1 ? `, max length ${data.type[1]}` : ''}`;
 				} else if (data.type[0] === 'channel') {
 					const types = data.type.slice(1);
-					type = `a channel (name/mention/id) with the type ${types.length === 1 ? types[0] : `${types.slice(0, -1).join(', ')}, or ${types[types.length]}`
+					type = `a channel (name/mention/id) with the type ${
+						types.length === 1 ? types[0] : `${types.slice(0, -1).join(', ')}, or ${types[types.length]}`
 					}`;
 				}
 			}
@@ -149,7 +152,7 @@ export default class SettingsCommand extends Command {
 				{ allowedResponses }
 			);
 			if (!response) {
-				await (<TextChannel>message.channel).bulkDelete(messages);
+				await (<TextChannel> message.channel).bulkDelete(messages);
 				return message.channel.send(
 					'3 Minute response timeout, cancelling command'
 				);
@@ -170,7 +173,7 @@ export default class SettingsCommand extends Command {
 				await tryAgain(result);
 				continue;
 			}
-			(<unknown>values[data.key]) = value;
+			(<unknown> values[data.key]) = value;
 		}
 
 		await message.guild!.config!.edit(values, true);
@@ -178,9 +181,9 @@ export default class SettingsCommand extends Command {
 		if (messages.length > 100) {
 			while (messages.length > 100) {
 				const msgs = messages.splice(0, 100);
-				await (<TextChannel>message.channel).bulkDelete(msgs);
+				await (<TextChannel> message.channel).bulkDelete(msgs);
 			}
-		} else await (<TextChannel>message.channel).bulkDelete(messages);
+		} else await (<TextChannel> message.channel).bulkDelete(messages);
 		return send('ADDED_CONFIG');
 	}
 
@@ -236,11 +239,11 @@ export default class SettingsCommand extends Command {
 				if (maxLength !== -1 && roles.length > maxLength) {
 					return null;
 				}
-				return <Role[]>roles;
+				return <Role[]> roles;
 			}
 		} else if (isArray(item.type) && item.type[0] === 'channel') {
 			const channel = Util.resolveChannel<TextChannel>(message, {
-				types: <(keyof typeof ChannelType)[]>item.type.slice(1),
+				types: <(keyof typeof ChannelType)[]> item.type.slice(1),
 				string: string.toLowerCase()
 			});
 			if (!channel) {
@@ -254,7 +257,7 @@ export default class SettingsCommand extends Command {
 	public validateValue(value: ConfigValue | null, item: SetupItem, suffix = ''): true | string {
 		if (value !== null) {
 			if (item.type[0] === 'channel') {
-				const ch = <GuildChannel | DMChannel | undefined>this.client.channels.cache.get(<string>value);
+				const ch = <GuildChannel | DMChannel | undefined> this.client.channels.cache.get(<string> value);
 				if (ch && ch.type !== 'dm') {
 					if (!ch.permissionsFor(this.client.user!)?.has(SEND_MESSAGE_PERMISSIONS)) {
 						return `I need the ${cleanPermissions(new Permissions(SEND_MESSAGE_PERMISSIONS))} permissions for that channel`;
@@ -272,7 +275,8 @@ export default class SettingsCommand extends Command {
 		} else if (item.type[0] === 'channel') {
 			return `That is not a valid channel${suffix}.`;
 		} else if (item.type[0] === 'roles') {
-			return `You provided an invalid role${item.type[1] !== -1 ? `, or too many roles (max: ${item.type[1]})` : ''
+			return `You provided an invalid role${
+				item.type[1] !== -1 ? `, or too many roles (max: ${item.type[1]})` : ''
 			}${suffix}.`;
 		}
 		throw null;

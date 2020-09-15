@@ -68,7 +68,7 @@ export default async function message(msg: Message) {
 				hasPermission = msg.guild.me!.hasPermission(guildPermissions.bitfield);
 			}
 			if (clientPermissions.bitfield !== 0) {
-				hasPermission = (<TextChannel>msg.channel).permissionsFor(client.user!)!.has(clientPermissions.bitfield);
+				hasPermission = (<TextChannel> msg.channel).permissionsFor(client.user!)!.has(clientPermissions.bitfield);
 			}
 			if (!hasPermission) {
 				return send('CLIENT_MISSING_PERMISSIONS', clientPermissions, guildPermissions);

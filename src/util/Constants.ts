@@ -237,7 +237,8 @@ export const CommandResponses = {
 			});
 	},
 	REMOVED_USER: (action: ModerationTypes.BAN | ModerationTypes.KICK, users: User[], reason: string) => {
-		return `${action === ModerationTypes.BAN ? 'Banned' : 'Kicked'} ${users.length === 1 ? users[0].tag : `${users.length} Users`
+		return `${action === ModerationTypes.BAN ? 'Banned' : 'Kicked'} ${
+			users.length === 1 ? users[0].tag : `${users.length} Users`
 		} for ${reason ? insertFullStop(reason) : DEFAULT_REASON}`;
 	},
 	INVITES_NOT_ALLOWED: (user: User) => ({
@@ -289,11 +290,13 @@ export const CommandErrors = {
 	CUSTOM_MESSAGE: (message: StringResolvable) => DJSUtil.resolveString(message),
 	NO_PERMISSION: (message?: string) => message ?? 'You don\'t have permissions to use this command!',
 	SAY_NO_ARGS: () => 'Please provide something to say!',
-	INVALID_MODE: (modes: string[], provided?: string) => `${provided
-		? `Mode \`${provided}\` is not a valid mode for this command`
-		: 'Please provide a mode for this command'
+	INVALID_MODE: (modes: string[], provided?: string) => `${
+		provided
+			? `Mode \`${provided}\` is not a valid mode for this command`
+			: 'Please provide a mode for this command'
 	}, try one of ${modes.slice(0, -1).map(mode => `\`${mode}\``).join(', ')}, or \`${modes[modes.length - 1]}\`.`,
-	INVALID_SETTING: (settings: string[]) => `You haven't provided a valid setting to modify, try one of ${settings.slice(0, -1).map(setting => `\`${setting}\``).join(', ')
+	INVALID_SETTING: (settings: string[]) => `You haven't provided a valid setting to modify, try one of ${
+		settings.slice(0, -1).map(setting => `\`${setting}\``).join(', ')
 	}, or \`${settings[settings.length - 1]}\`.`,
 	MENTION_MEMBER: (action: string, multiple = false) =>
 		`Please provide a valid member ${multiple ? 'or members ' : ''}to ${action}.`,

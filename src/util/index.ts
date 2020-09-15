@@ -17,10 +17,10 @@ export default class Util {
 	): Omit<T, K> {
 		const newObj: { [key: string]: any } = {};
 		for (const [key, value] of Object.entries(object)) {
-			if (keys.includes(<K>key)) continue;
+			if (keys.includes(<K> key)) continue;
 			newObj[key] = value;
 		}
-		return <{ [K in keyof T]: T[K] }>newObj;
+		return <{ [K in keyof T]: T[K] }> newObj;
 	}
 
 	static async readdirRecursive(directory: string | string[], filter = (filePath: string) => filePath.includes('.js')) {
@@ -52,18 +52,16 @@ export default class Util {
 	) {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		const response = CommandResponses[<keyof typeof CommandResponses>responseName](...options);
+		const response = CommandResponses[<keyof typeof CommandResponses> responseName](...options);
 		return channel.send(response);
 	}
 
 	static async awaitResponse(
 		channel: Omit<TextBasedChannelFields, 'bulkDelete'>,
 		user: User,
-		options: {
-			allowedResponses?: string[] | '*' | (
-				(message: Message) => boolean
-			), time?: number
-		}
+		options: { allowedResponses?: string[] | '*' | (
+			(message: Message) => boolean
+		), time?: number }
 	) {
 		if (!options.allowedResponses) options.allowedResponses = '*';
 		const response = (await channel.awaitMessages(message => {
@@ -94,8 +92,8 @@ export default class Util {
 		const forcedChannel = msg.mentions.channels.first()
 			|| msg.guild!.channels.cache.get(string);
 		if (forcedChannel) return (!types || types.includes(forcedChannel.type))
-			? <T>forcedChannel : null;
-		return <T | undefined>msg.guild!.channels.cache.find(
+			? <T> forcedChannel : null;
+		return <T | undefined> msg.guild!.channels.cache.find(
 			ch => (!types || types.includes(ch.type)) && (ch.name.toLowerCase() === string)
 		) || null;
 	}
@@ -107,10 +105,10 @@ export default class Util {
 			throw new Error('PROPERTY_DOESNT_EXIST', ['Given Object'], path[0]);
 		}
 		let current: any = object[path[0]];
-		for (let i = 1; i < path.length; i++) {
+		for (let i = 1;i < path.length;i++) {
 			const prop = path[i];
 			if (omit.includes(prop)) break;
-			const isLast = i === (path.length - 1);
+			const isLast = i === (path.length-1);
 			const type = typeof current[prop];
 			if (
 				(type !== 'object' && !isLast) || (type === 'undefined' && isLast)

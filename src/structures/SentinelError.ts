@@ -18,7 +18,7 @@ const makeError = (Class: typeof Error) => {
 			const message = <((...args: (typeof Errors)[T] extends Function
 				? Parameters<(typeof Errors)[T]>
 				: never[]
-			) => string)>Errors[name];
+			) => string)> Errors[name];
 			this.message = message(...extras);
 		}
 
