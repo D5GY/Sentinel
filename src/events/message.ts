@@ -42,19 +42,19 @@ export default async function message(msg: Message) {
 				if (!cont) return;
 			}
 		}
-    
+
 		if (!edited) {
 			if (!MENTION_REGEX) MENTION_REGEX = new RegExp(`^<@!?${client.user!.id}>$`);
 			if (MENTION_REGEX.test(msg.content)) {
 				return msg.channel.send(`My prefix is \`${prefix}\``);
 			}
 		}
-	
+
 		if (!msg.content.startsWith(prefix)) return;
 
 		const [plainCommand] = msg.content.slice(prefix.length).split(' ');
 		const args = new CommandArguments(msg);
-	
+
 		const command = client.resolveCommand(plainCommand.toLowerCase());
 		if (!command || (command.dmAllowed && !msg.guild)) return;
 		const send = getSend(msg, command);
@@ -68,7 +68,7 @@ export default async function message(msg: Message) {
 				hasPermission = msg.guild.me!.hasPermission(guildPermissions.bitfield);
 			}
 			if (clientPermissions.bitfield !== 0) {
-				hasPermission = (<TextChannel> msg.channel).permissionsFor(client.user!)!.has(clientPermissions.bitfield);
+				hasPermission = (<TextChannel>msg.channel).permissionsFor(client.user!)!.has(clientPermissions.bitfield);
 			}
 			if (!hasPermission) {
 				return send('CLIENT_MISSING_PERMISSIONS', clientPermissions, guildPermissions);
@@ -80,7 +80,7 @@ export default async function message(msg: Message) {
 			else if (typeof hasPermissions === 'string') {
 				return send({ content: hasPermissions });
 			} else if (hasPermissions === null) return;
-		} 
+		}
 		await command.run(msg, args, send);
 	} catch (error) {
 		if (error instanceof CommandError) {

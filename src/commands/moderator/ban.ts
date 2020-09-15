@@ -30,8 +30,11 @@ export default class BanCommand extends Command {
 
 	async run(message: Message, args: CommandArguments, send: SendFunction) {
 		const noMemberError = new CommandError('MENTION_MEMBER', 'ban');
-		if(!args[0]) throw noMemberError;
-		const { content, user, member } = await Util.extractMentions(args.regular, message.guild!, 1);
+		if (!args[0]) throw noMemberError;
+		const { content, members } = await Util.extractMentions(args.regular, {
+			client: this.client, guild: message.guild!, limit: 1
+		});
+		const member = members.first();
 		if (!member || member.id === message.author.id || member.id === this.client.user!.id) throw noMemberError;
 		if (!Util.isManageableBy(member, message.member!)) throw new CommandError('NOT_MANAGEABLE', ModerationTypes.BAN);
 		if (!member.bannable) throw new CommandError('NOT_MANAGEABLE', ModerationTypes.BAN, { byBot: true });
@@ -40,12 +43,12 @@ export default class BanCommand extends Command {
 			days: 7,
 			reason: `${message.author.tag}: ${content || DEFAULT_REASON}`
 		});
-    
+
 		const logChannel = message.guild!.config!.logsChannel;
 		if (logChannel) {
-			await Util.respondWith(logChannel, 'REMOVED_USER_LOG', ModerationTypes.BAN, message.member!, [user!], content);
+			await Util.respondWith(logChannel, 'REMOVED_USER_LOG', ModerationTypes.BAN, message.member!, [member.user], content);
 		}
-    
-		await send('REMOVED_USER', ModerationTypes.BAN, [user!], content);
+
+		await send('REMOVED_USER', ModerationTypes.BAN, [member.user], content);
 	}
 }

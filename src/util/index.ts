@@ -1,9 +1,15 @@
 import { promises as fs, stat as _stat } from 'fs';
 import * as nodeUtil from 'util';
 import * as path from 'path';
-import { Message, User, TextBasedChannelFields, GuildChannel, GuildMember, Guild, PartialTextBasedChannelFields, DMChannel } from 'discord.js';
+import {
+	Collection, DiscordAPIError, Constants as DJSConstants,
+	Client, Message, User, TextBasedChannelFields,
+	GuildChannel,GuildMember, Guild,
+	PartialTextBasedChannelFields, DMChannel
+} from 'discord.js';
 import { CommandResponses, SNOWFLAKE_REGEX } from './Constants';
 import { Error } from '../structures/SentinelError';
+import CommandError from '../structures/CommandError';
 const fileStats = nodeUtil.promisify(_stat);
 export default class Util {
 	static omitObject<T extends { [key: string]: any }, K extends keyof T>(
@@ -11,10 +17,10 @@ export default class Util {
 	): Omit<T, K> {
 		const newObj: { [key: string]: any } = {};
 		for (const [key, value] of Object.entries(object)) {
-			if (keys.includes(<K> key)) continue;
+			if (keys.includes(<K>key)) continue;
 			newObj[key] = value;
 		}
-		return <{ [K in keyof T]: T[K] }> newObj;
+		return <{ [K in keyof T]: T[K] }>newObj;
 	}
 
 	static async readdirRecursive(directory: string | string[], filter = (filePath: string) => filePath.includes('.js')) {
@@ -46,16 +52,18 @@ export default class Util {
 	) {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		const response = CommandResponses[<keyof typeof CommandResponses> responseName](...options);
+		const response = CommandResponses[<keyof typeof CommandResponses>responseName](...options);
 		return channel.send(response);
 	}
 
 	static async awaitResponse(
 		channel: Omit<TextBasedChannelFields, 'bulkDelete'>,
 		user: User,
-		options: { allowedResponses?: string[] | '*' | (
-			(message: Message) => boolean
-		), time?: number }
+		options: {
+			allowedResponses?: string[] | '*' | (
+				(message: Message) => boolean
+			), time?: number
+		}
 	) {
 		if (!options.allowedResponses) options.allowedResponses = '*';
 		const response = (await channel.awaitMessages(message => {
@@ -63,7 +71,7 @@ export default class Util {
 			if (options.allowedResponses === '*') return true;
 			else if (Array.isArray(options.allowedResponses)) return options.allowedResponses.includes(message.content.toLowerCase());
 			else if (typeof options.allowedResponses === 'function') return options.allowedResponses(message);
-			return false; 
+			return false;
 		}, {
 			max: 1,
 			time: options.time ?? 18e4
@@ -77,7 +85,7 @@ export default class Util {
 			|| msg.guild!.roles.cache.get(string)
 			|| msg.guild!.roles.cache.find(role => role.name.toLowerCase() === string) || null;
 	}
-	
+
 	static resolveChannel<T extends GuildChannel>(msg: Message, { string, types }: {
 		string?: string;
 		types?: (keyof typeof ChannelType)[];
@@ -86,8 +94,8 @@ export default class Util {
 		const forcedChannel = msg.mentions.channels.first()
 			|| msg.guild!.channels.cache.get(string);
 		if (forcedChannel) return (!types || types.includes(forcedChannel.type))
-			? <T> forcedChannel : null;
-		return <T | undefined> msg.guild!.channels.cache.find(
+			? <T>forcedChannel : null;
+		return <T | undefined>msg.guild!.channels.cache.find(
 			ch => (!types || types.includes(ch.type)) && (ch.name.toLowerCase() === string)
 		) || null;
 	}
@@ -99,14 +107,14 @@ export default class Util {
 			throw new Error('PROPERTY_DOESNT_EXIST', ['Given Object'], path[0]);
 		}
 		let current: any = object[path[0]];
-		for (let i = 1;i < path.length;i++) {
+		for (let i = 1; i < path.length; i++) {
 			const prop = path[i];
 			if (omit.includes(prop)) break;
-			const isLast = i === (path.length-1);
+			const isLast = i === (path.length - 1);
 			const type = typeof current[prop];
 			if (
 				(type !== 'object' && !isLast) || (type === 'undefined' && isLast)
-			) {	
+			) {
 				throw new Error(
 					'PROPERTY_DOESNT_EXIST',
 					path.slice(0, i), prop
@@ -116,22 +124,46 @@ export default class Util {
 		}
 		return current;
 	}
-  
-	static async extractMentions(string: string | string[], guild: Guild, limit: 1): Promise<SingleMentionData>;
-	static async extractMentions(string: string | string[], guild: Guild, limit: number) {
-		if (limit === 1) {
-			const [mention, ...rest] = typeof string === 'string' ? string.split(' ') : string;
-			const obj: SingleMentionData = { content: rest.join(' '), user: null, member: null };
+
+	static async extractMentions(string: string | string[], options: DMMentionExtractOptions): Promise<DMMentionData>;
+	static async extractMentions(string: string | string[], options: GuildMentionExtractOptions): Promise<GuildMentionData>;
+	static async extractMentions(string: string | string[], options: MentionExtractOptions): Promise<MentionData>;
+	static async extractMentions(string: string | string[], options: MentionExtractOptions) {
+		const content = typeof string === 'string' ? string.split(' ') : string;
+		const users = new Collection<string, User>();
+		const members = new Collection<string, GuildMember>();
+		const isDM = !options.guild;
+		for (let limit = options.limit ?? Infinity;limit > 0;limit--) {
+			const mention = content.shift();
+			if (!mention) break;
 			const userID = mention.match(SNOWFLAKE_REGEX)?.[0];
-			console.log(userID);
-			if (!userID) return obj;
+			if (!userID) {
+				content.unshift(mention);
+				break;
+			}
 			try {
-				obj.user = await guild.client.users.fetch(userID);
-				obj.member = await guild.members.fetch(obj.user);
-			} catch { } // eslint-disable-line no-empty
-			return obj;
+				const user = await options.client.users.fetch(userID);
+				users.set(user.id, user);
+				if (!isDM) {
+					const member = await options.guild!.members.fetch(user);
+					members.set(user.id, member);
+				}
+			} catch (error) {
+				if (error instanceof DiscordAPIError) {
+					if (error.code === DJSConstants.APIErrors.UNKNOWN_USER) {
+						throw new CommandError('UNKNOWN_USER', userID);
+					}
+					if (error.code === DJSConstants.APIErrors.UNKNOWN_MEMBER) {
+						continue;
+					}
+				}
+				throw error;
+			}
 		}
-		throw null;
+		if (isDM) {
+			return { content: content.join(' '), users };
+		}
+		return { content: content.join(' '), users, members };
 	}
 
 	static isManageableBy(member: GuildMember, by: GuildMember) {
@@ -152,8 +184,27 @@ interface GuildMessage extends Message {
 	guild: Guild;
 }
 
-interface SingleMentionData {
-  content: string;
-  user: User | null;
-  member: GuildMember | null;
+interface GuildMentionData {
+	content: string;
+	users: Collection<string, User>;
+	members: Collection<string, GuildMember>;
 }
+
+interface DMMentionData {
+	content: string;
+	users: Collection<string, User>;
+}
+
+type MentionData = GuildMentionData | DMMentionData;
+
+interface GuildMentionExtractOptions {
+	client: Client;
+	guild: Guild;
+	limit?: number;
+}
+
+interface DMMentionExtractOptions extends Omit<GuildMentionExtractOptions, 'guild'> {
+	guild?: null
+}
+
+type MentionExtractOptions = GuildMentionExtractOptions | DMMentionExtractOptions;

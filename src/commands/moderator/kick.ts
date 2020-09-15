@@ -30,19 +30,22 @@ export default class KickCommand extends Command {
 
 	async run(message: Message, args: CommandArguments, send: SendFunction) {
 		const noMemberError = new CommandError('MENTION_MEMBER', 'kick');
-		if(!args[0]) throw noMemberError;
-		const { content, user, member } = await Util.extractMentions(args.regular, message.guild!, 1);
+		if (!args[0]) throw noMemberError;
+		const { content, members } = await Util.extractMentions(args.regular, {
+			client: this.client, guild: message.guild!, limit: 1
+		});
+		const member = members.first();
 		if (!member || member.id === message.author.id || member.id === this.client.user!.id) throw noMemberError;
 		if (!Util.isManageableBy(member, message.member!)) throw new CommandError('NOT_MANAGEABLE', ModerationTypes.KICK);
 		if (!member.kickable) throw new CommandError('NOT_MANAGEABLE', ModerationTypes.KICK, { byBot: true });
 		// not handling errors, better idea for another commit
 		await member.kick(`${message.author.tag}: ${content || DEFAULT_REASON}`);
-    
+
 		const logChannel = message.guild!.config!.logsChannel;
 		if (logChannel) {
-			await Util.respondWith(logChannel, 'REMOVED_USER_LOG', ModerationTypes.KICK, message.member!, [user!], content);
+			await Util.respondWith(logChannel, 'REMOVED_USER_LOG', ModerationTypes.KICK, message.member!, [member.user], content);
 		}
-    
-		await send('REMOVED_USER', ModerationTypes.KICK, [user!], content);
+
+		await send('REMOVED_USER', ModerationTypes.KICK, [member.user], content);
 	}
 }

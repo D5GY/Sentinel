@@ -22,18 +22,20 @@ const config: SentinelConfig = require('./config.json');
 
 const client = new SentinelClient(
 	config, {
-		allowedMentions: { parse: [] },
-		partials: ['MESSAGE'],
-		presence: { activity: {
+	allowedMentions: { parse: [] },
+	partials: ['MESSAGE'],
+	presence: {
+		activity: {
 			name: `Sentinel ${packageJSON ? `v${packageJSON.version}` : 'Unknown Version'}`
-		} },
-		ws: {
-			intents: [
-				Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS,
-				Intents.FLAGS.GUILD_MESSAGES
-			]
 		}
+	},
+	ws: {
+		intents: [
+			Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS,
+			Intents.FLAGS.GUILD_MESSAGES
+		]
 	}
+}
 );
 client.on('ready', () => {
 	console.log(`${client.user!.tag} Is online`);

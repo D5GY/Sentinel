@@ -13,7 +13,7 @@ export default class InviteCommand extends Command {
 		}, __filename);
 	}
 
-	async run(message: Message,  args: CommandArguments, send: SendFunction) {
+	async run(message: Message, args: CommandArguments, send: SendFunction) {
 		const invite = await this.client.generateInvite([Permissions.FLAGS.BAN_MEMBERS, Permissions.FLAGS.KICK_MEMBERS]);
 		await send('CLIENT_INVITE', invite);
 	}

@@ -1,7 +1,7 @@
 import { Structures } from 'discord.js';
 import GuildConfig, { RawConfig } from '../../structures/GuildConfig';
 import { SQLQueryTypes } from '../../util/Constants';
-Structures.extend('Guild', (DJSGuild) => 
+Structures.extend('Guild', (DJSGuild) =>
 	class Message extends DJSGuild {
 		public config: GuildConfig | null = null;
 

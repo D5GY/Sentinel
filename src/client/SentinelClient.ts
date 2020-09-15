@@ -15,11 +15,11 @@ export default class SentinelClient extends Client {
 	public config: {
 		defaultPrefix: string;
 		devs: string[];
-    PRODUCTION: boolean;
-    readonly guildLogsChannelID: string;
-    readonly guildLogsChannel: TextChannel | null;
-    readonly suggestionsChannelID: string;
-    readonly suggestionsChannel: TextChannel | null;
+		PRODUCTION: boolean;
+		readonly guildLogsChannelID: string;
+		readonly guildLogsChannel: TextChannel | null;
+		readonly suggestionsChannelID: string;
+		readonly suggestionsChannel: TextChannel | null;
 	};
 	public database: DatabaseManager;
 	private __events: { path: string; fn: (...args: any[]) => void }[] = []
@@ -34,7 +34,7 @@ export default class SentinelClient extends Client {
 			suggestionsChannelID: { value: config.channels.suggestions },
 			suggestionsChannel: { get: () => this.channels.resolve(this.config.suggestionsChannelID) }
 		});
-		this.config = <SentinelClient['config']> _config;
+		this.config = <SentinelClient['config']>_config;
 		this.database = new DatabaseManager(config.database);
 	}
 
@@ -83,7 +83,7 @@ export default class SentinelClient extends Client {
 	public async loadEvents() {
 		if (this.__events.length) {
 			const cloned = this.__events.slice();
-			for (let i = 0;i < cloned.length;i++) {
+			for (let i = 0; i < cloned.length; i++) {
 				const { path, fn } = cloned[i];
 				this.__events.splice(i, 1);
 				this.off(fn.name, fn);
@@ -122,11 +122,11 @@ export interface SentinelConfig {
 		user: string;
 		password: string;
 		database: string;
-  };
-  channels: {
-    suggestions: string;
-    guildLogs: string;
-  };
+	};
+	channels: {
+		suggestions: string;
+		guildLogs: string;
+	};
 	PRODUCTION: boolean;
 }
 

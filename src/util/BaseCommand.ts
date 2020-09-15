@@ -7,9 +7,9 @@ export default class Command {
 	public client!: SentinelClient;
 	public path: string;
 
-  public aliases: string[];
-  public clientPermissions: Permissions | null;
-  public category?: string;
+	public aliases: string[];
+	public clientPermissions: Permissions | null;
+	public category?: string;
 	public name: string;
 	public usage: string;
 	public dmAllowed: boolean;
@@ -43,8 +43,8 @@ export default class Command {
 		let hasPermission: string | boolean | null = true;
 		if (typeof command.permissions === 'function') {
 			hasPermission = message.guild
-				? (<GuildPermissionsFunction> command.permissions)(message.member!, <TextChannel> message.channel)
-				: (<DMPermissionsFunction> command.permissions)(message.author, message.member, message.channel);
+				? (<GuildPermissionsFunction>command.permissions)(message.member!, <TextChannel>message.channel)
+				: (<DMPermissionsFunction>command.permissions)(message.author, message.member, message.channel);
 		} else if (typeof command.permissions === 'number') {
 			hasPermission = message.member!.hasPermission(command.permissions);
 		}
@@ -57,8 +57,8 @@ export default class Command {
 }
 
 export type CommandData = {
-  aliases?: string[];
-  clientPermissions?: PermissionResolvable;
+	aliases?: string[];
+	clientPermissions?: PermissionResolvable;
 	name: string;
 	usage?: string;
 	description: string;
@@ -87,7 +87,7 @@ export function getSend(message: Message, command: Command) {
 		...options: any[]
 	) {
 		if (typeof content === 'string') {
-			const response = CommandResponses[<keyof typeof CommandResponses> content];
+			const response = CommandResponses[<keyof typeof CommandResponses>content];
 			if (typeof response === 'function') {
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore

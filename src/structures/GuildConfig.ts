@@ -53,19 +53,19 @@ export default class GuildConfig {
 
 	public get memberJoinsChannel() {
 		if (!this.guild || !this.memberJoinsChannelID) return null;
-		return <TextChannel | null> (this.guild.channels.cache.get(this.memberJoinsChannelID) || null);
+		return <TextChannel | null>(this.guild.channels.cache.get(this.memberJoinsChannelID) || null);
 	}
 
 	public get memberLeavesChannel() {
 		if (!this.guild || !this.memberLeavesChannelID) return null;
-		return <TextChannel | null> (this.guild.channels.cache.get(this.memberLeavesChannelID) || null);
+		return <TextChannel | null>(this.guild.channels.cache.get(this.memberLeavesChannelID) || null);
 	}
-	
+
 	public get logsChannel() {
 		if (!this.guild || !this.logsChannelID) return null;
-		return <TextChannel | null> (this.guild.channels.cache.get(this.logsChannelID) || null);
+		return <TextChannel | null>(this.guild.channels.cache.get(this.logsChannelID) || null);
 	}
-  
+
 	public async edit(data: ConfigEditData, fillNull = false) {
 		const _data: Partial<RawConfig> = {};
 
@@ -130,11 +130,11 @@ export default class GuildConfig {
 		}
 
 		if (typeof data.autoMod === 'boolean' || fillNull) {
-			_data.auto_mod = <0 | 1> Number(data.autoMod ?? 0);
+			_data.auto_mod = <0 | 1>Number(data.autoMod ?? 0);
 		}
 
 		await this.client.database.query('UPDATE guilds SET :data WHERE id = :id', {
-			data: <SQLValues> _data,
+			data: <SQLValues>_data,
 			id: this.guildID
 		});
 		this.patch(_data);
@@ -154,11 +154,11 @@ export interface RawConfig {
 }
 
 export interface ConfigEditData {
-  prefix?: string | null;
-  modRoles?: RoleResolvable[] | null;
-  adminRoles?: RoleResolvable[] | null;
-  memberJoinsChannel?: string | TextChannel | null;
+	prefix?: string | null;
+	modRoles?: RoleResolvable[] | null;
+	adminRoles?: RoleResolvable[] | null;
+	memberJoinsChannel?: string | TextChannel | null;
 	memberLeavesChannel?: string | TextChannel | null;
 	logsChannel?: string | TextChannel | null;
-  autoMod?: boolean;
+	autoMod?: boolean;
 }

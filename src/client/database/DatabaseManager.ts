@@ -40,10 +40,10 @@ export default class DatabaseManager {
 			(params.length === 1 || (params.length === 2 && params[1] !== true)) &&
 			typeof params[0] == 'object' && params[0] !== null
 		) {
-			sql = DatabaseManager.format(sql, <SQLValues<SQLValues>> params[0]);
+			sql = DatabaseManager.format(sql, <SQLValues<SQLValues>>params[0]);
 			params = [];
 		} else if (sql === SQLQueryTypes.INSERT) {
-			sql = DatabaseManager.formatInsert(<string> params[0], <SQLValues> params[1]);
+			sql = DatabaseManager.formatInsert(<string>params[0], <SQLValues>params[1]);
 			params = [];
 		}
 		return new Promise<T[] | mysql.OkPacket>((resolve, reject) => {

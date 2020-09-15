@@ -33,12 +33,12 @@ export enum SQLQueryTypes {
 export enum SentinelColors {
 	GREEN = 0x00FF00,
 	RED = 0xFF0000,
-  LIGHT_BLUE = 0x0066ff,
-  ORANGE = 0Xff873d
+	LIGHT_BLUE = 0x0066ff,
+	ORANGE = 0Xff873d
 }
 
 export enum ModerationTypes {
-  BAN, KICK, MUTE, WARN, SOFTBAN
+	BAN, KICK, MUTE, WARN, SOFTBAN
 }
 
 export const EMBED_TIP = '*TIP: if you give me the `Embed Links` Permission I can display this in an embed!*';
@@ -67,15 +67,15 @@ export const CommandResponses = {
 			`Moderator Roles: ${config.modRoleIDs ? config.modRoles!.join(', ') : 'None set'}`,
 			`Join Messages: ${config.memberJoinsChannelID
 				? config.memberJoinsChannel ?? 'Channel Deleted'
-				:	'Disabled'
+				: 'Disabled'
 			}`,
 			`Leave Messages: ${config.memberLeavesChannelID
 				? config.memberLeavesChannel ?? 'Channel Deleted'
-				:	'Disabled'
+				: 'Disabled'
 			}`,
 			`Logs Channel: ${config.logsChannelID
 				? config.logsChannel ?? 'Channel Deleted'
-				:	'Disabled'
+				: 'Disabled'
 			}`,
 			'',
 			`You can use \`${config.prefix ?? client.config.defaultPrefix}settings edit [key] [newValue]\` to change any of these.`
@@ -99,13 +99,13 @@ export const CommandResponses = {
 			.setFooter('Sentinel')
 			.setThumbnail(user.displayAvatarURL({ dynamic: true }))
 			.setTimestamp()
-			.addFields({ 
+			.addFields({
 				name: 'User / ID',
 				value: `${user.tag} / ${user.id}`
 			},
 			{
 				name: 'Account Created At',
-				value: moment.utc(user.createdAt).format(DEFAULT_TIME_FORMAT) 
+				value: moment.utc(user.createdAt).format(DEFAULT_TIME_FORMAT)
 			},
 			{
 				name: 'New Member Count',
@@ -121,12 +121,12 @@ export const CommandResponses = {
 			.setFooter('Sentinel')
 			.setThumbnail(user.displayAvatarURL({ dynamic: true }))
 			.setTimestamp()
-			.addFields({ 
+			.addFields({
 				name: 'User / ID',
 				value: `${user.tag} / ${user.id}`
 			}, {
 				name: 'Account Created At',
-				value: moment.utc(user.createdAt).format(DEFAULT_TIME_FORMAT) 
+				value: moment.utc(user.createdAt).format(DEFAULT_TIME_FORMAT)
 			}, {
 				name: 'Originally Joined At',
 				value: moment.utc(member.joinedAt).format(DEFAULT_TIME_FORMAT)
@@ -237,8 +237,7 @@ export const CommandResponses = {
 			});
 	},
 	REMOVED_USER: (action: ModerationTypes.BAN | ModerationTypes.KICK, users: User[], reason: string) => {
-		return `${action === ModerationTypes.BAN ? 'Banned' : 'Kicked'} ${
-			users.length === 1 ? users[0].tag : `${users.length} Users`
+		return `${action === ModerationTypes.BAN ? 'Banned' : 'Kicked'} ${users.length === 1 ? users[0].tag : `${users.length} Users`
 		} for ${reason ? insertFullStop(reason) : DEFAULT_REASON}`;
 	},
 	INVITES_NOT_ALLOWED: (user: User) => ({
@@ -290,13 +289,11 @@ export const CommandErrors = {
 	CUSTOM_MESSAGE: (message: StringResolvable) => DJSUtil.resolveString(message),
 	NO_PERMISSION: (message?: string) => message ?? 'You don\'t have permissions to use this command!',
 	SAY_NO_ARGS: () => 'Please provide something to say!',
-	INVALID_MODE: (modes: string[], provided?: string) => `${
-		provided
-			? `Mode \`${provided}\` is not a valid mode for this command`
-			: 'Please provide a mode for this command'
+	INVALID_MODE: (modes: string[], provided?: string) => `${provided
+		? `Mode \`${provided}\` is not a valid mode for this command`
+		: 'Please provide a mode for this command'
 	}, try one of ${modes.slice(0, -1).map(mode => `\`${mode}\``).join(', ')}, or \`${modes[modes.length - 1]}\`.`,
-	INVALID_SETTING: (settings: string[]) => `You haven't provided a valid setting to modify, try one of ${
-		settings.slice(0, -1).map(setting => `\`${setting}\``).join(', ')
+	INVALID_SETTING: (settings: string[]) => `You haven't provided a valid setting to modify, try one of ${settings.slice(0, -1).map(setting => `\`${setting}\``).join(', ')
 	}, or \`${settings[settings.length - 1]}\`.`,
 	MENTION_MEMBER: (action: string, multiple = false) =>
 		`Please provide a valid member ${multiple ? 'or members ' : ''}to ${action}.`,
@@ -305,7 +302,8 @@ export const CommandErrors = {
 	SETUP_CONFIG: (prefix: string) => `This guild needs its config setup before using this command, use ${prefix}\`settings setup\``,
 	PROVIDE_SUGGESTION: () => 'Please provide something to suggest!',
 	SUGGESTION_LENGTH: () => 'That suggestion was too long, the max length is 1024 characters.',
-	DICTIONARY_PROVIDE_ARGS: () => 'Please provide a word to lookup!'
+	DICTIONARY_PROVIDE_ARGS: () => 'Please provide a word to lookup!',
+	UNKNOWN_USER: (idOrContent: string, isID = true) => `A user ${isID ? 'ID' : 'mention'} provided could not be resolved to a valid user (${idOrContent}).`
 };
 
 export const URLs = {
