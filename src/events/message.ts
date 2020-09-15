@@ -56,7 +56,7 @@ export default async function message(msg: Message) {
 		const args = new CommandArguments(msg);
 
 		const command = client.resolveCommand(plainCommand.toLowerCase());
-		if (!command || (command.dmAllowed && !msg.guild)) return;
+		if (!command || (!command.dmAllowed && !msg.guild)) return;
 		const send = getSend(msg, command);
 		let { clientPermissions } = command;
 		if (clientPermissions !== null && msg.guild) {
