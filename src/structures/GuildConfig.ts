@@ -60,12 +60,12 @@ export default class GuildConfig {
 		if (!this.guild || !this.memberLeavesChannelID) return null;
 		return <TextChannel | null> (this.guild.channels.cache.get(this.memberLeavesChannelID) || null);
 	}
-	
+
 	public get logsChannel() {
 		if (!this.guild || !this.logsChannelID) return null;
 		return <TextChannel | null> (this.guild.channels.cache.get(this.logsChannelID) || null);
 	}
-  
+
 	public async edit(data: ConfigEditData, fillNull = false) {
 		const _data: Partial<RawConfig> = {};
 
@@ -154,11 +154,11 @@ export interface RawConfig {
 }
 
 export interface ConfigEditData {
-  prefix?: string | null;
-  modRoles?: RoleResolvable[] | null;
-  adminRoles?: RoleResolvable[] | null;
-  memberJoinsChannel?: string | TextChannel | null;
+	prefix?: string | null;
+	modRoles?: RoleResolvable[] | null;
+	adminRoles?: RoleResolvable[] | null;
+	memberJoinsChannel?: string | TextChannel | null;
 	memberLeavesChannel?: string | TextChannel | null;
 	logsChannel?: string | TextChannel | null;
-  autoMod?: boolean;
+	autoMod?: boolean;
 }

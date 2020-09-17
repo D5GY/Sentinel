@@ -24,9 +24,11 @@ const client = new SentinelClient(
 	config, {
 		allowedMentions: { parse: [] },
 		partials: ['MESSAGE'],
-		presence: { activity: {
-			name: `Sentinel ${packageJSON ? `v${packageJSON.version}` : 'Unknown Version'}`
-		} },
+		presence: {
+			activity: {
+				name: `Sentinel ${packageJSON ? `v${packageJSON.version}` : 'Unknown Version'}`
+			}
+		},
 		ws: {
 			intents: [
 				Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS,

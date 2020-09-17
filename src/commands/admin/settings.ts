@@ -94,7 +94,7 @@ export default class SettingsCommand extends Command {
 			// force-fetch the config to be certian its updated
 			await send('VIEW_CONFIG',
 				await message.guild!.fetchConfig(true),
-        (<TextChannel> message.channel).permissionsFor(this.client.user!)!.has(Permissions.FLAGS.EMBED_LINKS)
+				(<TextChannel> message.channel).permissionsFor(this.client.user!)!.has(Permissions.FLAGS.EMBED_LINKS)
 			);
 			return;
 		} else if (args[0] === SettingModes.SETUP) {

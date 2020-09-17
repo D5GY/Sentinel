@@ -15,7 +15,7 @@ export default class SuggestCommand extends Command {
 		}, __filename);
 	}
 
-	async run(message: Message,  args: CommandArguments, send: SendFunction) {
+	async run(message: Message, args: CommandArguments, send: SendFunction) {
 		if (!args[0]) throw new CommandError('PROVIDE_SUGGESTION');
 		const suggestion = args.join(' ');
 		if (suggestion.length >= 1024) throw new CommandError('SUGGESTION_LENGTH');

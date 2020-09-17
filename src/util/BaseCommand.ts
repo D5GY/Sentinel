@@ -7,9 +7,9 @@ export default class Command {
 	public client!: SentinelClient;
 	public path: string;
 
-  public aliases: string[];
-  public clientPermissions: Permissions | null;
-  public category?: string;
+	public aliases: string[];
+	public clientPermissions: Permissions | null;
+	public category?: string;
 	public name: string;
 	public usage: string;
 	public dmAllowed: boolean;
@@ -57,8 +57,8 @@ export default class Command {
 }
 
 export type CommandData = {
-  aliases?: string[];
-  clientPermissions?: PermissionResolvable;
+	aliases?: string[];
+	clientPermissions?: PermissionResolvable;
 	name: string;
 	usage?: string;
 	description: string;

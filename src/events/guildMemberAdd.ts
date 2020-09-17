@@ -3,7 +3,7 @@ import Util from '../util';
 
 export default async function guildMemberAdd(
 	member: GuildMember
-)  {
+) {
 	try {
 		const guildConfig = await member.guild.fetchConfig();
 
