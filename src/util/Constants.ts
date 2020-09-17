@@ -277,11 +277,12 @@ export const CommandResponses = {
 			});
 	},
 	USER_AVATAR: (user: User) => {
+		const avatarURL = user.displayAvatarURL({ dynamic: true });
 		return new MessageEmbed()
 			.setColor(SentinelColors.LIGHT_BLUE)
-			.setAuthor(`${user.username}'s avatar`, user.displayAvatarURL({ dynamic: true })!)
-			.setDescription(`[Direct Link.](${user.displayAvatarURL({ dynamic: true })!})`)
-			.setImage(user.displayAvatarURL({ dynamic: true })!)
+			.setAuthor(`${user.username}'s avatar`, avatarURL)
+			.setDescription(`[Direct Link](${avatarURL}).`)
+			.setImage(avatarURL)
 			.setTimestamp();
 	}
 };

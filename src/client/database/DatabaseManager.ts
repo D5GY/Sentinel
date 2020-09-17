@@ -75,6 +75,6 @@ export default class DatabaseManager {
 
 export type SQLDataType<E = never> = number | Date | string | null | E;
 
-export interface SQLValues <E = never> {
+export interface SQLValues<E = never> {
 	[key: string]: SQLDataType | E;
 }

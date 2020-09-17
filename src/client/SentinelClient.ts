@@ -34,7 +34,7 @@ export default class SentinelClient extends Client {
 			suggestionsChannelID: { value: config.channels.suggestions },
 			suggestionsChannel: { get: () => this.channels.resolve(this.config.suggestionsChannelID) }
 		});
-		this.config = <SentinelClient['config']>_config;
+		this.config = <SentinelClient['config']> _config;
 		this.database = new DatabaseManager(config.database);
 	}
 
