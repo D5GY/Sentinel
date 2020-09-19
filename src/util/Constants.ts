@@ -284,6 +284,65 @@ export const CommandResponses = {
 			.setDescription(`[Direct Link](${avatarURL}).`)
 			.setImage(avatarURL)
 			.setTimestamp();
+	},
+	GUILD_STATS: (guild: Guild) => {
+		const [textChannels, otherType] = guild.channels.cache.partition(ch => ch.type === 'text');
+		const owner = guild.client.users.cache.get(guild.ownerID);
+		return new MessageEmbed()
+			.setColor(SentinelColors.LIGHT_BLUE)
+			.setAuthor(`${guild} information`, guild.iconURL({ dynamic: true }) ?? undefined)
+			.setFooter('Sentinel')
+			.setTimestamp()
+			.addFields({
+				name: 'Guild Overview:',
+				value: [
+					`> Name: ${guild.name}`,
+					`> ID: ${guild.id}`,
+					`> Owner: ${owner ? formatUser(owner) : 'Could not get owner'}`,
+					`> Region: ${guild.region}`,
+					`> Boost Tier: ${guild.premiumTier ? `Tier ${guild.premiumTier}` : 'none'}`,
+					`> Creation Time: ${moment(guild.createdAt).format(DEFAULT_TIME_FORMAT)}`
+				],
+				inline: true
+			}, {
+				name: 'Guild Stats:',
+				value: [
+					`> Member Count: ${guild.memberCount}`,
+					`> Total Roles: ${guild.roles.cache.size}`,
+					`> Total Text Channels: ${textChannels.size}`,
+					`> Total Voice Channels: ${otherType.filter(ch => ch.type === 'voice').size}`,
+					`> Total Emoji Count: ${guild.emojis.cache.size}`,
+					`> Total Boosts: ${guild.premiumSubscriptionCount ? `${guild.premiumSubscriptionCount} boosts` : '0'}`
+				],
+				inline: true
+			});
+	},
+	WHOIS: (member: GuildMember) => {
+		return new MessageEmbed()
+			.setColor(member.displayHexColor || SentinelColors.LIGHT_BLUE)
+			.setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
+			.setAuthor(`${member.user.tag} information`)
+			.setTimestamp()
+			.addFields({
+				name: 'User information',
+				value: [
+					`> Username: ${member.user.username}`,
+					`> Discriminator: ${member.user.discriminator}`,
+					`> ID: ${member.user.id}`,
+					`> Avatar Link: [Link to avatar](${member.user.displayAvatarURL({ dynamic: true })})`,
+					`> Time Created: ${moment(member.user.createdTimestamp).format(DEFAULT_TIME_FORMAT)}`,
+					`> Status: ${member.user.presence.status}`
+				],
+				inline: true
+			}, {
+				name: 'Member information',
+				value: [
+					`> Joined guild: ${moment(member.joinedAt).format(DEFAULT_TIME_FORMAT)}`,
+					`> Roles: ${member.roles.cache.map(r => r).join(', ')}`,
+					`> Last Message: ${member.user.lastMessage ? `[Message](${member.user.lastMessage.url})` : 'Can not get message'}`
+				],
+				inline: true
+			});
 	}
 };
 
