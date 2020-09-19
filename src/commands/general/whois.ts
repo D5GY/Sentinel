@@ -4,7 +4,7 @@ import { Message } from 'discord.js';
 import CommandArguments from '../../util/CommandArguments';
 import Util from '../../util';
 
-export default class guildStatsCommand extends Command {
+export default class WhoisCommand extends Command {
 	constructor(client: SentinelClient) {
 		super(client, {
 			aliases: [],
