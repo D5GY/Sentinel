@@ -368,7 +368,8 @@ export const CommandErrors = {
 	PROVIDE_SUGGESTION: () => 'Please provide something to suggest!',
 	SUGGESTION_LENGTH: () => 'That suggestion was too long, the max length is 1024 characters.',
 	DICTIONARY_PROVIDE_ARGS: () => 'Please provide a word to lookup!',
-	UNKNOWN_USER: (idOrContent: string, isID = true) => `A user ${isID ? 'ID' : 'mention'} provided could not be resolved to a valid user (${idOrContent}).`
+	UNKNOWN_USER: (idOrContent: string, isID = true) => `A user ${isID ? 'ID' : 'mention'} provided could not be resolved to a valid user (${idOrContent}).`,
+	UNKNOWN_MEMBER: (idOrContent: string, isID = true) => `A member ${isID ? 'ID' : 'mention'} provided could not be resolved to a valid member (${idOrContent}).`
 };
 
 export const URLs = {
