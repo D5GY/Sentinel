@@ -16,16 +16,11 @@ export default class AvatarCommand extends Command {
 	}
 
 	async run(message: Message, args: CommandArguments, send: SendFunction) {
-		let user = message.author;
-		if (args.regular.length) {
-			const { content, users } = await Util.extractMentions(args.regular, {
-				client: this.client, guild: message.guild, limit: 1
-			});
-			if (!users.size) {
-				throw new CommandError('UNKNOWN_USER', content, false);
-			}
-			user = users.first()!;
-		}
+		const { users } = await Util.extractMentions(args.regular, {
+			client: this.client, guild: message.guild, limit: 1
+		});
+		const user = users.first() || message.author;
+		if (!user) throw new CommandError('MENTION_MEMBER', 'display their avatar');
 		await send('USER_AVATAR', user);
 	}
 }
