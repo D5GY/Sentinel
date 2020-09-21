@@ -286,7 +286,7 @@ export const CommandResponses = {
 			.setTimestamp();
 	},
 	GUILD_STATS: (guild: Guild) => {
-		const [textChannels, otherType] = guild.channels.cache.partition(ch => ch.type === 'text');
+		const [textChannels, otherTypes] = guild.channels.cache.partition(ch => ch.type === 'text');
 		const owner = guild.client.users.cache.get(guild.ownerID);
 		return new MessageEmbed()
 			.setColor(SentinelColors.LIGHT_BLUE)
@@ -298,7 +298,7 @@ export const CommandResponses = {
 				value: [
 					`> Name: ${guild.name}`,
 					`> ID: ${guild.id}`,
-					`> Owner: ${owner ? formatUser(owner) : 'Could not get owner'}`,
+					`> Owner: ${owner ? formatUser(owner) : guild.ownerID}`,
 					`> Region: ${guild.region}`,
 					`> Boost Tier: ${guild.premiumTier ? `Tier ${guild.premiumTier}` : 'none'}`,
 					`> Creation Time: ${moment(guild.createdAt).format(DEFAULT_TIME_FORMAT)}`
@@ -310,36 +310,38 @@ export const CommandResponses = {
 					`> Member Count: ${guild.memberCount}`,
 					`> Total Roles: ${guild.roles.cache.size}`,
 					`> Total Text Channels: ${textChannels.size}`,
-					`> Total Voice Channels: ${otherType.filter(ch => ch.type === 'voice').size}`,
+					`> Total Voice Channels: ${otherTypes.filter(ch => ch.type === 'voice').size}`,
 					`> Total Emoji Count: ${guild.emojis.cache.size}`,
-					`> Total Boosts: ${guild.premiumSubscriptionCount ? `${guild.premiumSubscriptionCount} boosts` : '0'}`
+					`> Total Boosts: ${guild.premiumSubscriptionCount ? `${guild.premiumSubscriptionCount} ${plural('boost', guild.premiumSubscriptionCount > 1)}` : 'None'}`
 				],
 				inline: true
 			});
 	},
 	WHOIS: (member: GuildMember) => {
+		const { user } = member;
+		const avatarURL = user.displayAvatarURL({ dynamic: true });
 		return new MessageEmbed()
-			.setColor(member.displayHexColor || SentinelColors.LIGHT_BLUE)
-			.setThumbnail(member.user.displayAvatarURL({ dynamic: true }))
-			.setAuthor(`${member.user.tag} information`)
+			.setColor(member.displayColor || SentinelColors.LIGHT_BLUE)
+			.setThumbnail(avatarURL)
+			.setAuthor(`${user.tag} information`)
 			.setTimestamp()
 			.addFields({
 				name: 'User information',
 				value: [
-					`> Username: ${member.user.username}`,
-					`> Discriminator: ${member.user.discriminator}`,
-					`> ID: ${member.user.id}`,
-					`> Avatar Link: [Link to avatar](${member.user.displayAvatarURL({ dynamic: true })})`,
-					`> Time Created: ${moment(member.user.createdTimestamp).format(DEFAULT_TIME_FORMAT)}`,
-					`> Status: ${member.user.presence.status}`
+					`> Username: ${user.username}`,
+					`> Discriminator: ${user.discriminator}`,
+					`> ID: ${user.id}`,
+					`> Avatar Link: [Link to avatar](${avatarURL})`,
+					`> Time Created: ${moment(user.createdTimestamp).format(DEFAULT_TIME_FORMAT)}`,
+					`> Status: ${user.presence.status}`
 				],
 				inline: true
 			}, {
 				name: 'Member information',
 				value: [
 					`> Joined guild: ${moment(member.joinedAt).format(DEFAULT_TIME_FORMAT)}`,
-					`> Roles: ${member.roles.cache.map(r => r).join(', ')}`,
-					`> Last Message: ${member.user.lastMessage ? `[Message](${member.user.lastMessage.url})` : 'Can not get message'}`
+					`> Roles: ${member.roles.cache.array().join(', ')}`,
+					`> Last Message: ${member.lastMessage ? `[Message](${member.lastMessage.url})` : 'Unknown'}`
 				],
 				inline: true
 			});
