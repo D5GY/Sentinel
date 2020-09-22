@@ -342,7 +342,7 @@ export const CommandResponses = {
 				name: 'Member information',
 				value: [
 					`> Time Joined: ${moment(member.joinedAt).format(DEFAULT_TIME_FORMAT)}`,
-					`> Roles: ${roles.length > 0 ? roles.array().join(', ') : 'No Roles'}`,
+					`> Roles: ${roles.size > 0 ? roles.array().join(', ') : 'No Roles'}`,
 					`> Last Message: ${member.lastMessage ? `[Message](${member.lastMessage.url})` : 'Unknown'}`
 				],
 				inline: true
