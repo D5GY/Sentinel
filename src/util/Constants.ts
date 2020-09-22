@@ -284,6 +284,69 @@ export const CommandResponses = {
 			.setDescription(`[Direct Link](${avatarURL}).`)
 			.setImage(avatarURL)
 			.setTimestamp();
+	},
+	GUILD_STATS: (guild: Guild) => {
+		const [textChannels, otherTypes] = guild.channels.cache.partition(ch => ch.type === 'text');
+		const owner = guild.client.users.cache.get(guild.ownerID);
+		return new MessageEmbed()
+			.setColor(SentinelColors.LIGHT_BLUE)
+			.setAuthor(`${guild} information`, guild.iconURL({ dynamic: true }) ?? undefined)
+			.setFooter('Sentinel')
+			.setTimestamp()
+			.addFields({
+				name: 'Guild Overview:',
+				value: [
+					`> Name: ${guild.name}`,
+					`> ID: ${guild.id}`,
+					`> Owner: ${owner ? formatUser(owner) : guild.ownerID}`,
+					`> Region: ${guild.region}`,
+					`> Boost Tier: ${guild.premiumTier ? `Tier ${guild.premiumTier}` : 'None'}`,
+					`> Creation Time: ${moment(guild.createdAt).format(DEFAULT_TIME_FORMAT)}`
+				],
+				inline: true
+			}, {
+				name: 'Guild Stats:',
+				value: [
+					`> Member Count: ${guild.memberCount}`,
+					`> Total Roles: ${guild.roles.cache.size}`,
+					`> Total Text Channels: ${textChannels.size}`,
+					`> Total Voice Channels: ${otherTypes.filter(ch => ch.type === 'voice').size}`,
+					`> Total Emoji Count: ${guild.emojis.cache.size}`,
+					`> Total Boosts: ${guild.premiumSubscriptionCount ? `${guild.premiumSubscriptionCount} ${plural('boost', guild.premiumSubscriptionCount > 1)}` : 'None'}`
+				],
+				inline: true
+			});
+	},
+	WHOIS: (member: GuildMember) => {
+		const { user } = member;
+		const avatarURL = user.displayAvatarURL({ dynamic: true });
+		const roles = member.roles.cache;
+		roles.delete(member.guild.id);
+		return new MessageEmbed()
+			.setColor(member.displayColor || SentinelColors.LIGHT_BLUE)
+			.setThumbnail(avatarURL)
+			.setAuthor(`${user.tag} information`)
+			.setTimestamp()
+			.addFields({
+				name: 'User information',
+				value: [
+					`> Username: ${user.username}`,
+					`> Discriminator: ${user.discriminator}`,
+					`> ID: ${user.id}`,
+					`> Avatar Link: [Link to avatar](${avatarURL})`,
+					`> Time Created: ${moment(user.createdTimestamp).format(DEFAULT_TIME_FORMAT)}`,
+					`> Status: ${user.presence.status}`
+				],
+				inline: true
+			}, {
+				name: 'Member information',
+				value: [
+					`> Time Joined: ${moment(member.joinedAt).format(DEFAULT_TIME_FORMAT)}`,
+					`> Roles: ${roles.size > 0 ? roles.array().join(', ') : 'No Roles'}`,
+					`> Last Message: ${member.lastMessage ? `[Message](${member.lastMessage.url})` : 'Unknown'}`
+				],
+				inline: true
+			});
 	}
 };
 
@@ -307,7 +370,8 @@ export const CommandErrors = {
 	PROVIDE_SUGGESTION: () => 'Please provide something to suggest!',
 	SUGGESTION_LENGTH: () => 'That suggestion was too long, the max length is 1024 characters.',
 	DICTIONARY_PROVIDE_ARGS: () => 'Please provide a word to lookup!',
-	UNKNOWN_USER: (idOrContent: string, isID = true) => `A user ${isID ? 'ID' : 'mention'} provided could not be resolved to a valid user (${idOrContent}).`
+	UNKNOWN_USER: (idOrContent: string, isID = true) => `A user ${isID ? 'ID' : 'mention'} provided could not be resolved to a valid user (${idOrContent}).`,
+	UNKNOWN_MEMBER: (idOrContent: string, isID = true) => `A member ${isID ? 'ID' : 'mention'} provided could not be resolved to a valid member (${idOrContent}).`
 };
 
 export const URLs = {
