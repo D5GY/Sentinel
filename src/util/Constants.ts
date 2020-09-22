@@ -300,7 +300,7 @@ export const CommandResponses = {
 					`> ID: ${guild.id}`,
 					`> Owner: ${owner ? formatUser(owner) : guild.ownerID}`,
 					`> Region: ${guild.region}`,
-					`> Boost Tier: ${guild.premiumTier ? `Tier ${guild.premiumTier}` : 'none'}`,
+					`> Boost Tier: ${guild.premiumTier ? `Tier ${guild.premiumTier}` : 'None'}`,
 					`> Creation Time: ${moment(guild.createdAt).format(DEFAULT_TIME_FORMAT)}`
 				],
 				inline: true
@@ -320,6 +320,8 @@ export const CommandResponses = {
 	WHOIS: (member: GuildMember) => {
 		const { user } = member;
 		const avatarURL = user.displayAvatarURL({ dynamic: true });
+		const roles = member.roles.cache;
+		roles.delete(member.guild.id);
 		return new MessageEmbed()
 			.setColor(member.displayColor || SentinelColors.LIGHT_BLUE)
 			.setThumbnail(avatarURL)
@@ -339,8 +341,8 @@ export const CommandResponses = {
 			}, {
 				name: 'Member information',
 				value: [
-					`> Joined guild: ${moment(member.joinedAt).format(DEFAULT_TIME_FORMAT)}`,
-					`> Roles: ${member.roles.cache.array().join(', ')}`,
+					`> Time Joined: ${moment(member.joinedAt).format(DEFAULT_TIME_FORMAT)}`,
+					`> Roles: ${roles.length > 0 ? roles.array().join(', ') : 'No Roles'}`,
 					`> Last Message: ${member.lastMessage ? `[Message](${member.lastMessage.url})` : 'Unknown'}`
 				],
 				inline: true
