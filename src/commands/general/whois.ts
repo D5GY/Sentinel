@@ -16,7 +16,7 @@ export default class WhoisCommand extends Command {
 	}
 
 	async run(message: Message, args: CommandArguments, send: SendFunction) {
-		let member = message.member;
+		let member = message.member!;
 		if (args.regular.length) {
 			const { content, members } = await Util.extractMentions(args.regular, {
 				client: this.client, guild: message.guild!, limit: 1
@@ -26,6 +26,6 @@ export default class WhoisCommand extends Command {
 			}
 			member = members.first()!;
 		}
-		await send('WHOIS', member!);
+		await send('WHOIS', member);
 	}
 }
