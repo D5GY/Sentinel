@@ -3,7 +3,6 @@ import CommandArguments from '../util/CommandArguments';
 import Command, { getSend } from '../util/BaseCommand';
 import CommandError from '../structures/CommandError';
 import AutoMod from '../util/AutoMod';
-// import Util from '../util';
 
 const GUILD_PERMISSIONS = [
 	Permissions.FLAGS.BAN_MEMBERS,
