@@ -1,7 +1,7 @@
 import GuildConfig from '../structures/GuildConfig';
 import { PermissionString, MessageEmbed, GuildMember, Guild, Message, StringResolvable, Util as DJSUtil, PartialMessage, Permissions, User } from 'discord.js';
 import * as moment from 'moment';
-import { data } from '../commands/general/lookup';
+import { IPData } from '../commands/general/lookup';
 
 export const DEFAULT_TIME_FORMAT = 'DD/MM/YYYY HH:mm:ss';
 export const SQL_SEARCH_REGEX = /:(\w+)/g;
@@ -350,48 +350,48 @@ export const CommandResponses = {
 				inline: true
 			});
 	},
-	LOOKUP: (address: data) => {
+	LOOKUP: (data: IPData) => {
 		return new MessageEmbed()
 			.setColor(SentinelColors.LIGHT_BLUE)
 			.addFields({
 				name: 'Address',
-				value: address.query || 'Unknown',
+				value: data.query || 'Unknown',
 				inline: true
 			}, {
 				name: 'ISP',
-				value: address.isp || 'Unknown',
+				value: data.isp || 'Unknown',
 				inline: true
 			}, {
 				name: 'Country',
-				value: address.country || 'Unknown',
+				value: data.country || 'Unknown',
 				inline: true
 			}, {
 				name: 'Region',
-				value: address.regionName || 'Unknown',
+				value: data.regionName || 'Unknown',
 				inline: true
 			}, {
 				name: 'City',
-				value: address.city || 'Unknown',
+				value: data.city || 'Unknown',
 				inline: true
 			}, {
 				name: 'Timezone',
-				value: address.timezone || 'Unknown',
+				value: data.timezone || 'Unknown',
 				inline: true
 			}, {
 				name: 'ZIP',
-				value: address.zip || 'Unknown',
+				value: data.zip || 'Unknown',
 				inline: true
 			}, {
 				name: 'Latitude',
-				value: address.lat || 'Unknown',
+				value: data.lat || 'Unknown',
 				inline: true
 			}, {
 				name: '	Longitude',
-				value: address.lon || 'Unknown',
+				value: data.lon || 'Unknown',
 				inline: true
 			}, {
 				name: 'ORG' || 'Unknown',
-				value: address.org,
+				value: data.org,
 				inline: true
 			})
 			.setFooter('Sentinel')

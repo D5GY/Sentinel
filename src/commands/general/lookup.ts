@@ -29,7 +29,7 @@ export default class LookupCommand extends Command {
 	}
 }
 
-export interface data {
+export interface IPData {
   status: 'success' | 'fail';
   query: string;
   isp: string;
