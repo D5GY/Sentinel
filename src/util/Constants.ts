@@ -421,10 +421,10 @@ export const CommandErrors = {
 	DICTIONARY_PROVIDE_ARGS: () => 'Please provide a word to lookup!',
 	UNKNOWN_USER: (idOrContent: string, isID = true) => `A user ${isID ? 'ID' : 'mention'} provided could not be resolved to a valid user (${idOrContent}).`,
 	UNKNOWN_MEMBER: (idOrContent: string, isID = true) => `A member ${isID ? 'ID' : 'mention'} provided could not be resolved to a valid member (${idOrContent}).`,
-	PROVIDE_IP: () => 'Please provide a IP to lookup.'
+	PROVIDE_IP: () => 'Please provide a valid IP to lookup.'
 };
 
 export const URLs = {
 	HASTEBIN: (endpointOrID: string) => `https://paste.nomsy.net${endpointOrID ? `/${endpointOrID}` : ''}`,
-	IP_API: (query: string) => `http://ip-api.com/json/${query}`
+	IP_API: (query: string, fields: number) => `http://ip-api.com/json/${query}?fields=${fields}`
 };

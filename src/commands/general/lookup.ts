@@ -18,19 +18,19 @@ export default class LookupCommand extends Command {
 
 	async run(message: Message, args: CommandArguments, send: SendFunction) {
 		const ip = args[0];
-		const valid = IP_REGEX.test(ip);
-		if (!ip || !valid) throw new CommandError('PROVIDE_IP');
+		if (!ip || !IP_REGEX.test(ip)) throw new CommandError('PROVIDE_IP');
      
-		const response = await fetch(URLs.IP_API(ip));
+		const response = await fetch(URLs.IP_API(ip, 34809));
 		if (response.status == 404) throw new CommandError('PROVIDE_IP');
 		const data = await response.json();
+		if (response.status !== 200) throw new CommandError('CUSTOM_MESSAGE', data.message || 'Unknown error');
 
 		await send('LOOKUP', data);
 	}
 }
 
 export interface IPData {
-  status: 'success' | 'fail';
+  message?: string;
   query: string;
   isp: string;
   country: string;
