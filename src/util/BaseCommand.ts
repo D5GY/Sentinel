@@ -98,7 +98,7 @@ export function getSend(message: Message, command: Command) {
 		let response = message.lastCommand && message.lastCommand.response;
 		response = await (response
 			? response.edit(content, options[0])
-			: message.channel.send(content, ...options[0]));
+			: message.channel.send(content, options[0]));
 		message.setLastCommand(command, response);
 		return response;
 	}
