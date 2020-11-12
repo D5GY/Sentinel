@@ -1,12 +1,13 @@
 import GuildConfig from '../structures/GuildConfig';
 import { PermissionString, MessageEmbed, GuildMember, Guild, Message, StringResolvable, Util as DJSUtil, PartialMessage, Permissions, User } from 'discord.js';
 import * as moment from 'moment';
-import { IPData } from '../commands/general/lookup';
+import { data } from '../commands/general/lookup';
 
 export const DEFAULT_TIME_FORMAT = 'DD/MM/YYYY HH:mm:ss';
 export const SQL_SEARCH_REGEX = /:(\w+)/g;
 export const SNOWFLAKE_REGEX = /(\d{16,19})/g;
 export const INVITE_REGEX = /discord(?:(?:app)?\.com\/invite|\.gg(?:\/invite)?)\/([\w-]{2,255})/gi;
+export const IP_REGEX = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
 
 export const SEND_MESSAGE_PERMISSIONS = Permissions.resolve([
 	Permissions.FLAGS.SEND_MESSAGES, Permissions.FLAGS.VIEW_CHANNEL
@@ -349,60 +350,52 @@ export const CommandResponses = {
 				inline: true
 			});
 	},
-	LOOKUP: (address: IPData) => {
-		if (address.status === 'success') {
-			return new MessageEmbed()
-				.setColor(SentinelColors.LIGHT_BLUE)
-				.addFields({
-					name: 'Address',
-					value: address.query,
-					inline: true
-				}, {
-					name: 'ISP',
-					value: address.isp,
-					inline: true
-				}, {
-					name: 'Country',
-					value: address.country,
-					inline: true
-				}, {
-					name: 'Region',
-					value: address.regionName,
-					inline: true
-				}, {
-					name: 'City',
-					value: address.city,
-					inline: true
-				}, {
-					name: 'Timezone',
-					value: address.timezone,
-					inline: true
-				}, {
-					name: 'ZIP',
-					value: address.zip,
-					inline: true
-				}, {
-					name: 'Latitude',
-					value: address.lat,
-					inline: true
-				}, {
-					name: '	Longitude',
-					value: address.lon,
-					inline: true
-				}, {
-					name: 'ORG',
-					value: address.org,
-					inline: true
-				})
-				.setFooter('Sentinel')
-				.setTimestamp();
-		} else if (address.status === 'fail') {
-			return new MessageEmbed()
-				.setColor(SentinelColors.LIGHT_BLUE)
-				.setDescription('ERROR! Invalid address')
-				.setFooter('Sentinel')
-				.setTimestamp();
-		}
+	LOOKUP: (address: data) => {
+		return new MessageEmbed()
+			.setColor(SentinelColors.LIGHT_BLUE)
+			.addFields({
+				name: 'Address',
+				value: address.query || 'Unknown',
+				inline: true
+			}, {
+				name: 'ISP',
+				value: address.isp || 'Unknown',
+				inline: true
+			}, {
+				name: 'Country',
+				value: address.country || 'Unknown',
+				inline: true
+			}, {
+				name: 'Region',
+				value: address.regionName || 'Unknown',
+				inline: true
+			}, {
+				name: 'City',
+				value: address.city || 'Unknown',
+				inline: true
+			}, {
+				name: 'Timezone',
+				value: address.timezone || 'Unknown',
+				inline: true
+			}, {
+				name: 'ZIP',
+				value: address.zip || 'Unknown',
+				inline: true
+			}, {
+				name: 'Latitude',
+				value: address.lat || 'Unknown',
+				inline: true
+			}, {
+				name: '	Longitude',
+				value: address.lon || 'Unknown',
+				inline: true
+			}, {
+				name: 'ORG' || 'Unknown',
+				value: address.org,
+				inline: true
+			})
+			.setFooter('Sentinel')
+			.setTimestamp();
 	}
 };
 

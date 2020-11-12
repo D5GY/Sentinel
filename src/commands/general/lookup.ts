@@ -3,7 +3,7 @@ import SentinelClient from '../../client/SentinelClient';
 import { Message } from 'discord.js';
 import CommandArguments from '../../util/CommandArguments';
 import CommandError from '../../structures/CommandError';
-import { URLs } from '../../util/Constants';
+import { IP_REGEX, URLs } from '../../util/Constants';
 import fetch from 'node-fetch';
 
 export default class LookupCommand extends Command {
@@ -18,7 +18,7 @@ export default class LookupCommand extends Command {
 
 	async run(message: Message, args: CommandArguments, send: SendFunction) {
 		const ip = args[0];
-		const valid = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ip);
+		const valid = IP_REGEX.test(ip);
 		if (!ip || !valid) throw new CommandError('PROVIDE_IP');
      
 		const response = await fetch(URLs.IP_API(ip));
@@ -29,16 +29,16 @@ export default class LookupCommand extends Command {
 	}
 }
 
-export interface IPData {
+export interface data {
   status: 'success' | 'fail';
-  query: string | 'Unknown';
-  isp: string | 'Unknown';
-  country: string | 'Unknown';
-  regionName: string | 'Unknown';
-  city: string | 'Unknown';
-  timezone: string | 'Unknown';
-  zip: string | 'Unknown';
-  lat: number | 'Unknown';
-  lon: number | 'Unknown';
-  org: string | 'Unknown';
+  query: string;
+  isp: string;
+  country: string;
+  regionName: string;
+  city: string;
+  timezone: string;
+  zip: string;
+  lat: number;
+  lon: number;
+  org: string;
 }
