@@ -1,6 +1,7 @@
 import GuildConfig from '../structures/GuildConfig';
 import { PermissionString, MessageEmbed, GuildMember, Guild, Message, StringResolvable, Util as DJSUtil, PartialMessage, Permissions, User } from 'discord.js';
 import * as moment from 'moment';
+import { IPData } from '../commands/general/lookup';
 
 export const DEFAULT_TIME_FORMAT = 'DD/MM/YYYY HH:mm:ss';
 export const SQL_SEARCH_REGEX = /:(\w+)/g;
@@ -347,6 +348,61 @@ export const CommandResponses = {
 				],
 				inline: true
 			});
+	},
+	LOOKUP: (address: IPData) => {
+		if (address.status === 'success') {
+			return new MessageEmbed()
+				.setColor(SentinelColors.LIGHT_BLUE)
+				.addFields({
+					name: 'Address',
+					value: address.query,
+					inline: true
+				}, {
+					name: 'ISP',
+					value: address.isp,
+					inline: true
+				}, {
+					name: 'Country',
+					value: address.country,
+					inline: true
+				}, {
+					name: 'Region',
+					value: address.regionName,
+					inline: true
+				}, {
+					name: 'City',
+					value: address.city,
+					inline: true
+				}, {
+					name: 'Timezone',
+					value: address.timezone,
+					inline: true
+				}, {
+					name: 'ZIP',
+					value: address.zip,
+					inline: true
+				}, {
+					name: 'Latitude',
+					value: address.lat,
+					inline: true
+				}, {
+					name: '	Longitude',
+					value: address.lon,
+					inline: true
+				}, {
+					name: 'ORG',
+					value: address.org,
+					inline: true
+				})
+				.setFooter('Sentinel')
+				.setTimestamp();
+		} else if (address.status === 'fail') {
+			return new MessageEmbed()
+				.setColor(SentinelColors.LIGHT_BLUE)
+				.setDescription('ERROR! Invalid address')
+				.setFooter('Sentinel')
+				.setTimestamp();
+		}
 	}
 };
 
@@ -371,9 +427,11 @@ export const CommandErrors = {
 	SUGGESTION_LENGTH: () => 'That suggestion was too long, the max length is 1024 characters.',
 	DICTIONARY_PROVIDE_ARGS: () => 'Please provide a word to lookup!',
 	UNKNOWN_USER: (idOrContent: string, isID = true) => `A user ${isID ? 'ID' : 'mention'} provided could not be resolved to a valid user (${idOrContent}).`,
-	UNKNOWN_MEMBER: (idOrContent: string, isID = true) => `A member ${isID ? 'ID' : 'mention'} provided could not be resolved to a valid member (${idOrContent}).`
+	UNKNOWN_MEMBER: (idOrContent: string, isID = true) => `A member ${isID ? 'ID' : 'mention'} provided could not be resolved to a valid member (${idOrContent}).`,
+	PROVIDE_IP: () => 'Please provide a IP to lookup.'
 };
 
 export const URLs = {
-	HASTEBIN: (endpointOrID: string) => `https://paste.nomsy.net${endpointOrID ? `/${endpointOrID}` : ''}`
+	HASTEBIN: (endpointOrID: string) => `https://paste.nomsy.net${endpointOrID ? `/${endpointOrID}` : ''}`,
+	IP_API: (query: string) => `http://ip-api.com/json/${query}`
 };
