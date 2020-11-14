@@ -383,15 +383,15 @@ export const CommandResponses = {
 				inline: true
 			}, {
 				name: 'Latitude',
-				value: data.lat || 'Unknown',
+				value: data.lat ?? 'Unknown',
 				inline: true
 			}, {
 				name: '	Longitude',
-				value: data.lon || 'Unknown',
+				value: data.lon ?? 'Unknown',
 				inline: true
 			}, {
-				name: 'ORG' || 'Unknown',
-				value: data.org,
+				name: 'ORG',
+				value: data.org || 'Unknown',
 				inline: true
 			})
 			.setFooter('Sentinel')
