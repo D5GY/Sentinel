@@ -1,11 +1,13 @@
 import GuildConfig from '../structures/GuildConfig';
 import { PermissionString, MessageEmbed, GuildMember, Guild, Message, StringResolvable, Util as DJSUtil, PartialMessage, Permissions, User } from 'discord.js';
 import * as moment from 'moment';
+import { IPData } from '../commands/general/lookup';
 
 export const DEFAULT_TIME_FORMAT = 'DD/MM/YYYY HH:mm:ss';
 export const SQL_SEARCH_REGEX = /:(\w+)/g;
 export const SNOWFLAKE_REGEX = /(\d{16,19})/g;
 export const INVITE_REGEX = /discord(?:(?:app)?\.com\/invite|\.gg(?:\/invite)?)\/([\w-]{2,255})/gi;
+export const IP_REGEX = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
 
 export const SEND_MESSAGE_PERMISSIONS = Permissions.resolve([
 	Permissions.FLAGS.SEND_MESSAGES, Permissions.FLAGS.VIEW_CHANNEL
@@ -347,6 +349,53 @@ export const CommandResponses = {
 				],
 				inline: true
 			});
+	},
+	LOOKUP: (data: IPData) => {
+		return new MessageEmbed()
+			.setColor(SentinelColors.LIGHT_BLUE)
+			.addFields({
+				name: 'Address',
+				value: data.query || 'Unknown',
+				inline: true
+			}, {
+				name: 'ISP',
+				value: data.isp || 'Unknown',
+				inline: true
+			}, {
+				name: 'Country',
+				value: data.country || 'Unknown',
+				inline: true
+			}, {
+				name: 'Region',
+				value: data.regionName || 'Unknown',
+				inline: true
+			}, {
+				name: 'City',
+				value: data.city || 'Unknown',
+				inline: true
+			}, {
+				name: 'Timezone',
+				value: data.timezone || 'Unknown',
+				inline: true
+			}, {
+				name: 'ZIP',
+				value: data.zip || 'Unknown',
+				inline: true
+			}, {
+				name: 'Latitude',
+				value: data.lat ?? 'Unknown',
+				inline: true
+			}, {
+				name: '	Longitude',
+				value: data.lon ?? 'Unknown',
+				inline: true
+			}, {
+				name: 'ORG',
+				value: data.org || 'Unknown',
+				inline: true
+			})
+			.setFooter('Sentinel')
+			.setTimestamp();
 	}
 };
 
@@ -371,9 +420,11 @@ export const CommandErrors = {
 	SUGGESTION_LENGTH: () => 'That suggestion was too long, the max length is 1024 characters.',
 	DICTIONARY_PROVIDE_ARGS: () => 'Please provide a word to lookup!',
 	UNKNOWN_USER: (idOrContent: string, isID = true) => `A user ${isID ? 'ID' : 'mention'} provided could not be resolved to a valid user (${idOrContent}).`,
-	UNKNOWN_MEMBER: (idOrContent: string, isID = true) => `A member ${isID ? 'ID' : 'mention'} provided could not be resolved to a valid member (${idOrContent}).`
+	UNKNOWN_MEMBER: (idOrContent: string, isID = true) => `A member ${isID ? 'ID' : 'mention'} provided could not be resolved to a valid member (${idOrContent}).`,
+	PROVIDE_IP: () => 'Please provide a valid IP to lookup.'
 };
 
 export const URLs = {
-	HASTEBIN: (endpointOrID: string) => `https://paste.nomsy.net${endpointOrID ? `/${endpointOrID}` : ''}`
+	HASTEBIN: (endpointOrID: string) => `https://paste.nomsy.net${endpointOrID ? `/${endpointOrID}` : ''}`,
+	IP_API: (query: string, fields: number) => `http://ip-api.com/json/${query}?fields=${fields}`
 };
