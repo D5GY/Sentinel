@@ -319,7 +319,7 @@ export const CommandResponses = {
 				inline: true
 			}, {
 				name: 'Guild Roles:',
-				value: `> ${guild.roles.cache.array().filter(r => r.name !== '@everyone').join(', ')}`
+				value: `> ${guild.roles.cache.array().filter(r => r.id !== guild.id).join(', ')}`
 			});
 	},
 	WHOIS: (member: GuildMember) => {
