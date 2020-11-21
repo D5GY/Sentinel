@@ -317,6 +317,9 @@ export const CommandResponses = {
 					`> Total Boosts: ${guild.premiumSubscriptionCount ? `${guild.premiumSubscriptionCount} ${plural('boost', guild.premiumSubscriptionCount > 1)}` : 'None'}`
 				],
 				inline: true
+			}, {
+				name: 'Guild Roles:',
+				value: `> ${guild.roles.cache.array().filter(r => r.name !== '@everyone').join(', ')}`
 			});
 	},
 	WHOIS: (member: GuildMember) => {
