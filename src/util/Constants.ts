@@ -290,6 +290,18 @@ export const CommandResponses = {
 	GUILD_STATS: (guild: Guild) => {
 		const [textChannels, otherTypes] = guild.channels.cache.partition(ch => ch.type === 'text');
 		const owner = guild.client.users.cache.get(guild.ownerID);
+		const roles = guild.roles.cache.clone().delete(guild.id).array();
+		let roleString = '';
+		for (let i = 0;i < roles.length;i++) {
+			const role = roles[i];
+			roleString += role.toString();
+			if (i < (roles.length - 1)) roleString += ', ';
+			
+			if (roleString.length > 150) {
+				roleString += `... ${roles.length - i} more roles.`;
+				break;
+			}
+		}
 		return new MessageEmbed()
 			.setColor(SentinelColors.LIGHT_BLUE)
 			.setAuthor(`${guild} information`, guild.iconURL({ dynamic: true }) ?? undefined)
@@ -319,7 +331,7 @@ export const CommandResponses = {
 				inline: true
 			}, {
 				name: 'Guild Roles:',
-				value: `> ${guild.roles.cache.array().filter(r => r.id !== guild.id).join(', ')}`
+				value: `> ${roleString}`
 			});
 	},
 	WHOIS: (member: GuildMember) => {
