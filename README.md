@@ -7,4 +7,4 @@ Sentinel is a multi purpose discord bot. This bot will offer many features such 
 
 The development team work hard at making this bot as stable as possible and listen to feedback our users suggest.
 
-If you would like support our bot please join our [discord](https://discord.gg/2qMmFKn "Sentinel Discord Server") & even try it out in your guild.
+If you would like support our bot please join our [discord](https://discord.gg/2qMmFKn "Sentinel Discord Server") & or even [invite](https://discord.com/oauth2/authorize?client_id=739203261797498953&permissions=8&scope=bot) to use Sentinel in your guild.
