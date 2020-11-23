@@ -290,10 +290,11 @@ export const CommandResponses = {
 	GUILD_STATS: (guild: Guild) => {
 		const [textChannels, otherTypes] = guild.channels.cache.partition(ch => ch.type === 'text');
 		const owner = guild.client.users.cache.get(guild.ownerID);
-		const roles = guild.roles.cache.clone().delete(guild.id).array();
+		const roles = guild.roles.cache.clone().array();
 		let roleString = '';
 		for (let i = 0;i < roles.length;i++) {
 			const role = roles[i];
+			if (role.id === guild.id) continue;
 			roleString += role.toString();
 			if (i < (roles.length - 1)) roleString += ', ';
 			
