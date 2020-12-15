@@ -290,7 +290,7 @@ export const CommandResponses = {
 	GUILD_STATS: (guild: Guild) => {
 		const [textChannels, otherTypes] = guild.channels.cache.partition(ch => ch.type === 'text');
 		const owner = guild.client.users.cache.get(guild.ownerID);
-		const roles = guild.roles.cache.clone().array();
+		const roles = guild.roles.cache.clone().array().filter(r => r.id !== guild.id);
 		let roleString = '';
 		for (let i = 0;i < roles.length;i++) {
 			const role = roles[i];
@@ -298,7 +298,7 @@ export const CommandResponses = {
 			roleString += role.toString();
 			if (i < (roles.length - 1)) roleString += ', ';
 			
-			if (roleString.length > 150) {
+			if (roleString.length > 500) {
 				roleString += `... ${roles.length - i} more roles.`;
 				break;
 			}
@@ -315,7 +315,7 @@ export const CommandResponses = {
 					`> ID: ${guild.id}`,
 					`> Owner: ${owner ? formatUser(owner) : guild.ownerID}`,
 					`> Region: ${guild.region}`,
-					`> Boost Tier: ${guild.premiumTier ? `Tier ${guild.premiumTier}` : 'None'}`,
+					`> Boost Tier: ${guild.premiumTier ? guild.premiumTier : 'None'}`,
 					`> Creation Time: ${moment(guild.createdAt).format(DEFAULT_TIME_FORMAT)}`
 				],
 				inline: true
