@@ -2,6 +2,7 @@ import GuildConfig from '../structures/GuildConfig';
 import { PermissionString, MessageEmbed, GuildMember, Guild, Message, StringResolvable, Util as DJSUtil, PartialMessage, Permissions, User } from 'discord.js';
 import * as moment from 'moment';
 import { IPData } from '../commands/general/lookup';
+import { Role } from 'discord.js';
 
 export const DEFAULT_TIME_FORMAT = 'DD/MM/YYYY HH:mm:ss';
 export const SQL_SEARCH_REGEX = /:(\w+)/g;
@@ -402,12 +403,48 @@ export const CommandResponses = {
 				value: data.lat ?? 'Unknown',
 				inline: true
 			}, {
-				name: '	Longitude',
+				name: 'Longitude',
 				value: data.lon ?? 'Unknown',
 				inline: true
 			}, {
 				name: 'ORG',
 				value: data.org || 'Unknown',
+				inline: true
+			})
+			.setFooter('Sentinel')
+			.setTimestamp();
+	},
+	ROLE_INFO: (role: Role) => {
+		const color = role.color ? role.hexColor : null;
+		return new MessageEmbed()
+			.setColor(color || SentinelColors.LIGHT_BLUE)
+			.addFields({
+				name: 'Name',
+				value: role.name,
+				inline: true
+			}, {
+				name: 'ID',
+				value: role.id,
+				inline: true
+			}, {
+				name: 'Color',
+				value: color ? color : 'No Color',
+				inline: true
+			}, {
+				name: 'Hoisted',
+				value: role.hoist ? 'Yes' : 'No',
+				inline: true
+			}, {
+				name: 'Position',
+				value: role.position,
+				inline: true
+			}, {
+				name: 'Mentionable',
+				value: role.mentionable ? 'Yes' : 'No',
+				inline: true
+			}, {
+				name: 'Created',
+				value: moment.utc(role.createdAt).format(DEFAULT_TIME_FORMAT),
 				inline: true
 			})
 			.setFooter('Sentinel')
@@ -437,7 +474,8 @@ export const CommandErrors = {
 	DICTIONARY_PROVIDE_ARGS: () => 'Please provide a word to lookup!',
 	UNKNOWN_USER: (idOrContent: string, isID = true) => `A user ${isID ? 'ID' : 'mention'} provided could not be resolved to a valid user (${idOrContent}).`,
 	UNKNOWN_MEMBER: (idOrContent: string, isID = true) => `A member ${isID ? 'ID' : 'mention'} provided could not be resolved to a valid member (${idOrContent}).`,
-	PROVIDE_IP: () => 'Please provide a valid IP to lookup.'
+	PROVIDE_IP: () => 'Please provide a valid IP to lookup.',
+	MENTION_ROLE: () => 'Please provide a valid role.'
 };
 
 export const URLs = {
