@@ -10,7 +10,7 @@ export default class RoleinfoCommand extends Command {
 		super(client, {
 			aliases: [],
 			name: 'roleinfo',
-			dmAllowed: true,
+			dmAllowed: false,
 			description: 'Get information about a specific role.'
 		}, __filename);
 	}

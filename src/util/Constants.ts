@@ -1,8 +1,7 @@
 import GuildConfig from '../structures/GuildConfig';
-import { PermissionString, MessageEmbed, GuildMember, Guild, Message, StringResolvable, Util as DJSUtil, PartialMessage, Permissions, User } from 'discord.js';
+import { PermissionString, MessageEmbed, GuildMember, Guild, Message, StringResolvable, Util as DJSUtil, PartialMessage, Permissions, User, Role } from 'discord.js';
 import * as moment from 'moment';
 import { IPData } from '../commands/general/lookup';
-import { Role } from 'discord.js';
 
 export const DEFAULT_TIME_FORMAT = 'DD/MM/YYYY HH:mm:ss';
 export const SQL_SEARCH_REGEX = /:(\w+)/g;
@@ -417,7 +416,7 @@ export const CommandResponses = {
 	ROLE_INFO: (role: Role) => {
 		const color = role.color ? role.hexColor : null;
 		return new MessageEmbed()
-			.setColor(color || SentinelColors.LIGHT_BLUE)
+			.setColor(color ?? SentinelColors.LIGHT_BLUE)
 			.addFields({
 				name: 'Name',
 				value: role.name,
@@ -428,7 +427,7 @@ export const CommandResponses = {
 				inline: true
 			}, {
 				name: 'Color',
-				value: color ? color : 'No Color',
+				value: color ?? 'No Color',
 				inline: true
 			}, {
 				name: 'Hoisted',
