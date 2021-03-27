@@ -1,5 +1,5 @@
 import GuildConfig from '../structures/GuildConfig';
-import { PermissionString, MessageEmbed, GuildMember, Guild, Message, StringResolvable, Util as DJSUtil, PartialMessage, Permissions, User } from 'discord.js';
+import { PermissionString, MessageEmbed, GuildMember, Guild, Message, StringResolvable, Util as DJSUtil, PartialMessage, Permissions, User, Role } from 'discord.js';
 import * as moment from 'moment';
 import { IPData } from '../commands/general/lookup';
 
@@ -290,6 +290,19 @@ export const CommandResponses = {
 	GUILD_STATS: (guild: Guild) => {
 		const [textChannels, otherTypes] = guild.channels.cache.partition(ch => ch.type === 'text');
 		const owner = guild.client.users.cache.get(guild.ownerID);
+		const roles = guild.roles.cache.clone().array().filter(r => r.id !== guild.id);
+		let roleString = '';
+		for (let i = 0;i < roles.length;i++) {
+			const role = roles[i];
+			if (role.id === guild.id) continue;
+			roleString += role.toString();
+			if (i < (roles.length - 1)) roleString += ', ';
+			
+			if (roleString.length > 500) {
+				roleString += `... ${roles.length - i} more roles.`;
+				break;
+			}
+		}
 		return new MessageEmbed()
 			.setColor(SentinelColors.LIGHT_BLUE)
 			.setAuthor(`${guild} information`, guild.iconURL({ dynamic: true }) ?? undefined)
@@ -302,7 +315,7 @@ export const CommandResponses = {
 					`> ID: ${guild.id}`,
 					`> Owner: ${owner ? formatUser(owner) : guild.ownerID}`,
 					`> Region: ${guild.region}`,
-					`> Boost Tier: ${guild.premiumTier ? `Tier ${guild.premiumTier}` : 'None'}`,
+					`> Boost Tier: ${guild.premiumTier ? guild.premiumTier : 'None'}`,
 					`> Creation Time: ${moment(guild.createdAt).format(DEFAULT_TIME_FORMAT)}`
 				],
 				inline: true
@@ -317,6 +330,9 @@ export const CommandResponses = {
 					`> Total Boosts: ${guild.premiumSubscriptionCount ? `${guild.premiumSubscriptionCount} ${plural('boost', guild.premiumSubscriptionCount > 1)}` : 'None'}`
 				],
 				inline: true
+			}, {
+				name: 'Guild Roles:',
+				value: `> ${roleString}`
 			});
 	},
 	WHOIS: (member: GuildMember) => {
@@ -386,12 +402,48 @@ export const CommandResponses = {
 				value: data.lat ?? 'Unknown',
 				inline: true
 			}, {
-				name: '	Longitude',
+				name: 'Longitude',
 				value: data.lon ?? 'Unknown',
 				inline: true
 			}, {
 				name: 'ORG',
 				value: data.org || 'Unknown',
+				inline: true
+			})
+			.setFooter('Sentinel')
+			.setTimestamp();
+	},
+	ROLE_INFO: (role: Role) => {
+		const color = role.color ? role.hexColor : null;
+		return new MessageEmbed()
+			.setColor(color ?? SentinelColors.LIGHT_BLUE)
+			.addFields({
+				name: 'Name',
+				value: role.name,
+				inline: true
+			}, {
+				name: 'ID',
+				value: role.id,
+				inline: true
+			}, {
+				name: 'Color',
+				value: color ?? 'No Color',
+				inline: true
+			}, {
+				name: 'Hoisted',
+				value: role.hoist ? 'Yes' : 'No',
+				inline: true
+			}, {
+				name: 'Position',
+				value: role.position,
+				inline: true
+			}, {
+				name: 'Mentionable',
+				value: role.mentionable ? 'Yes' : 'No',
+				inline: true
+			}, {
+				name: 'Created',
+				value: moment.utc(role.createdAt).format(DEFAULT_TIME_FORMAT),
 				inline: true
 			})
 			.setFooter('Sentinel')
@@ -421,7 +473,8 @@ export const CommandErrors = {
 	DICTIONARY_PROVIDE_ARGS: () => 'Please provide a word to lookup!',
 	UNKNOWN_USER: (idOrContent: string, isID = true) => `A user ${isID ? 'ID' : 'mention'} provided could not be resolved to a valid user (${idOrContent}).`,
 	UNKNOWN_MEMBER: (idOrContent: string, isID = true) => `A member ${isID ? 'ID' : 'mention'} provided could not be resolved to a valid member (${idOrContent}).`,
-	PROVIDE_IP: () => 'Please provide a valid IP to lookup.'
+	PROVIDE_IP: () => 'Please provide a valid IP to lookup.',
+	MENTION_ROLE: () => 'Please provide a valid role.'
 };
 
 export const URLs = {
