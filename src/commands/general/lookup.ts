@@ -20,7 +20,7 @@ export default class LookupCommand extends Command {
 		const ip = args[0];
 		if (!ip || !IP_REGEX.test(ip)) throw new CommandError('PROVIDE_IP');
      
-		const response = await fetch(URLs.IP_API(ip, 34809));
+		const response = await fetch(URLs.IP_API(ip, 59387));
 		if (response.status == 404) throw new CommandError('PROVIDE_IP');
 		const data = await response.json();
 		if (response.status !== 200) throw new CommandError('CUSTOM_MESSAGE', data.message || 'Unknown error');

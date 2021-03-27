@@ -383,11 +383,11 @@ export const CommandResponses = {
 				inline: true
 			}, {
 				name: 'Latitude',
-				value: data.lat ?? 'Unknown',
+				value: data.lat || 'Unknown',
 				inline: true
 			}, {
-				name: '	Longitude',
-				value: data.lon ?? 'Unknown',
+				name: 'Longitude',
+				value: data.lon || 'Unknown',
 				inline: true
 			}, {
 				name: 'ORG',
