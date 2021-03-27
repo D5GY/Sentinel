@@ -354,8 +354,8 @@ export const CommandResponses = {
 		return new MessageEmbed()
 			.setColor(SentinelColors.LIGHT_BLUE)
 			.addFields({
-				name: 'Address' || 'Unknown',
-				value: data.query,
+				name: 'Address',
+				value: data.query || 'Unknown',
 				inline: true
 			}, {
 				name: 'ISP',
